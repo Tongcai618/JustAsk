@@ -1,0 +1,12 @@
+{
+  "name": "justask",
+  "version": "1.0.0",
+  "description": "JustAsk — Desktop chat UI powered by Ollama",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron ."
+  },
+  "devDependencies": {
+    "electron": "^33.0.0"
+  }
+}
