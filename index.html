@@ -319,11 +319,6 @@
       text-align: center;
     }
 
-    #sidebar-footer-btns {
-      display: flex;
-      gap: 6px;
-      margin-bottom: 6px;
-    }
 
     /* ── Main area ───────────────────────────────────────────── */
     #main {
@@ -360,6 +355,27 @@
       font-weight: 600;
       color: var(--primary-text);
     }
+
+    .header-spacer { flex: 1; }
+
+    .header-btn {
+      -webkit-app-region: no-drag;
+      background: rgba(255,255,255,0.12);
+      border: none;
+      color: var(--primary-text);
+      font-size: 11px;
+      font-weight: 500;
+      padding: 5px 10px;
+      border-radius: 6px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      transition: background 0.15s;
+    }
+    .header-btn:hover { background: rgba(255,255,255,0.22); }
+    .header-btn.active { background: rgba(255,255,255,0.28); }
+    .header-btn svg { width: 12px; height: 12px; }
 
     #messages {
       flex: 1;
@@ -553,7 +569,10 @@
       gap: 8px;
       pointer-events: none;
     }
-    .empty-state .icon { font-size: 36px; }
+    .empty-state .icon {
+      width: 48px;
+      height: 48px;
+    }
     .empty-state .hint { font-size: 12px; color: var(--text-7); }
 
     .error-bubble {
@@ -569,25 +588,6 @@
       font-size: 12px;
     }
 
-    /* ── Sidebar toggle buttons ──────────────────────────────── */
-    .sidebar-toggle-btn {
-      flex: 1;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 6px;
-      background: none;
-      border: 1px solid var(--border-strong);
-      color: var(--text-5);
-      font-size: 11px;
-      padding: 5px 10px;
-      border-radius: 6px;
-      cursor: pointer;
-      transition: all 0.15s;
-    }
-    .sidebar-toggle-btn:hover { color: var(--text-3); border-color: var(--text-6); }
-    .sidebar-toggle-btn.active { color: var(--link); border-color: var(--primary); background: var(--primary-bg-subtle); }
-    .sidebar-toggle-btn svg { width: 12px; height: 12px; flex-shrink: 0; }
 
     /* ── Playground view ─────────────────────────────────────── */
     #playground {
@@ -983,6 +983,33 @@
   <header>
     <h1>JustAsk</h1>
     <span class="model-badge">gemma4:e2b</span>
+    <div class="header-spacer"></div>
+    <button id="playground-toggle" class="header-btn" onclick="togglePlayground()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="3" y="3" width="7" height="7"></rect>
+        <rect x="14" y="3" width="7" height="7"></rect>
+        <rect x="3" y="14" width="7" height="7"></rect>
+        <rect x="14" y="14" width="7" height="7"></rect>
+      </svg>
+      Playground
+    </button>
+    <button id="theme-toggle" class="header-btn" onclick="toggleTheme()">
+      <svg id="theme-icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+      </svg>
+      <svg id="theme-icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none;">
+        <circle cx="12" cy="12" r="5"></circle>
+        <line x1="12" y1="1" x2="12" y2="3"></line>
+        <line x1="12" y1="21" x2="12" y2="23"></line>
+        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+        <line x1="1" y1="12" x2="3" y2="12"></line>
+        <line x1="21" y1="12" x2="23" y2="12"></line>
+        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+      </svg>
+      <span id="theme-label">Light</span>
+    </button>
   </header>
 
   <div id="app-body">
@@ -1000,34 +1027,6 @@
     </div>
     <div id="conversation-list"></div>
     <div id="sidebar-footer">
-      <div id="sidebar-footer-btns">
-        <button id="playground-toggle" class="sidebar-toggle-btn" onclick="togglePlayground()">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <rect x="3" y="3" width="7" height="7"></rect>
-            <rect x="14" y="3" width="7" height="7"></rect>
-            <rect x="3" y="14" width="7" height="7"></rect>
-            <rect x="14" y="14" width="7" height="7"></rect>
-          </svg>
-          Playground
-        </button>
-        <button id="theme-toggle" class="sidebar-toggle-btn" onclick="toggleTheme()">
-          <svg id="theme-icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
-          </svg>
-          <svg id="theme-icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none;">
-            <circle cx="12" cy="12" r="5"></circle>
-            <line x1="12" y1="1" x2="12" y2="3"></line>
-            <line x1="12" y1="21" x2="12" y2="23"></line>
-            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
-            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
-            <line x1="1" y1="12" x2="3" y2="12"></line>
-            <line x1="21" y1="12" x2="23" y2="12"></line>
-            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
-            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
-          </svg>
-          <span id="theme-label">Light</span>
-        </button>
-      </div>
       <div style="color:var(--text-6); font-size:11px; text-align:center;">Conversations saved locally</div>
     </div>
   </div>
@@ -1386,7 +1385,7 @@ const response = await fetch('/api/chat', {
             <div class="pg-atom-label">Welcome / Empty</div>
             <div class="pg-atom-render" style="justify-content:center;">
               <div class="pg-empty-demo">
-                <div style="font-size:36px;">&#9670;</div>
+                <img class="icon" src="assets/leaf.svg" alt="leaf" />
                 <div>Start a conversation</div>
                 <div class="pg-empty-hint">Shift+Enter for new line &middot; Enter to send</div>
               </div>
@@ -1425,7 +1424,7 @@ const response = await fetch('/api/chat', {
   <div id="main">
     <div id="messages">
       <div class="empty-state" id="empty-state">
-        <div class="icon">&#9670;</div>
+        <img class="icon" src="assets/leaf.svg" alt="leaf" />
         <div>Start a conversation</div>
         <div class="hint">Shift+Enter for new line &middot; Enter to send</div>
       </div>
@@ -1455,6 +1454,7 @@ const response = await fetch('/api/chat', {
     let isStreaming = false;
     let currentConvId = null;
     let conversations = [];
+    let pendingNewChat = false;
 
     // ── DOM refs ─────────────────────────────────────────────
     const messagesEl = document.getElementById('messages');
@@ -1525,12 +1525,28 @@ const response = await fetch('/api/chat', {
 
     // ── Sidebar rendering ────────────────────────────────────
     function renderSidebar() {
-      if (conversations.length === 0) {
+      convListEl.innerHTML = '';
+
+      // Show pending "New conversation" item at the top
+      if (pendingNewChat) {
+        const pending = document.createElement('div');
+        pending.className = 'conv-item active';
+        const t = document.createElement('span');
+        t.className = 'conv-title';
+        t.textContent = 'New conversation';
+        const d = document.createElement('span');
+        d.className = 'conv-date';
+        d.textContent = 'Now';
+        pending.appendChild(t);
+        pending.appendChild(d);
+        convListEl.appendChild(pending);
+      }
+
+      if (conversations.length === 0 && !pendingNewChat) {
         convListEl.innerHTML = '<div class="no-history">No conversations yet</div>';
         return;
       }
 
-      convListEl.innerHTML = '';
       for (const conv of conversations) {
         const item = document.createElement('div');
         item.className = 'conv-item' + (conv.id === currentConvId ? ' active' : '');
@@ -1589,6 +1605,7 @@ const response = await fetch('/api/chat', {
       if (!currentConvId) {
         currentConvId = generateId();
       }
+      pendingNewChat = false;
 
       const conv = {
         id: currentConvId,
@@ -1606,6 +1623,7 @@ const response = await fetch('/api/chat', {
 
       const conv = conversations.find(c => c.id === id);
       if (!conv) return;
+      pendingNewChat = false;
 
       currentConvId = conv.id;
       history = [...conv.messages];
@@ -1639,12 +1657,13 @@ const response = await fetch('/api/chat', {
       if (isStreaming) return;
       currentConvId = null;
       history = [];
+      pendingNewChat = true;
       messagesEl.innerHTML = '';
 
       const es = document.createElement('div');
       es.className = 'empty-state';
       es.id = 'empty-state';
-      es.innerHTML = '<div class="icon">&#9670;</div><div>Start a conversation</div><div class="hint">Shift+Enter for new line &middot; Enter to send</div>';
+      es.innerHTML = '<img class="icon" src="assets/leaf.svg" alt="leaf" /><div>Start a conversation</div><div class="hint">Shift+Enter for new line &middot; Enter to send</div>';
       messagesEl.appendChild(es);
 
       renderSidebar();
