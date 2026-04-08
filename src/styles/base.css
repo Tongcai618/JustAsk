@@ -12,6 +12,13 @@ body {
   transition: background 0.25s, color 0.25s;
 }
 
+#root {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+}
+
 #app-body {
   display: flex;
   flex-direction: row;

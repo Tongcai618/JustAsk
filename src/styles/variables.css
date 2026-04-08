@@ -95,7 +95,7 @@
   --progress-red: #994444;
 }
 
-body.light {
+[data-theme="light"] {
   --bg: #f0f3ed;
   --surface: #ffffff;
   --card: #e8ede4;

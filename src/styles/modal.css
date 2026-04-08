@@ -14,7 +14,7 @@
   background: var(--surface);
   border: 1px solid var(--border-strong);
   border-radius: 14px;
-  width: 520px;
+  width: 480px;
   max-height: 80vh;
   display: flex;
   flex-direction: column;
@@ -22,6 +22,7 @@
   overflow: hidden;
 }
 
+/* ── Header ──────────────────────────────────────────── */
 #manage-header {
   padding: 18px 20px 14px;
   border-bottom: 1px solid var(--border);
@@ -35,46 +36,60 @@
   color: var(--text);
   margin: 0;
 }
-#manage-close {
+#manage-close,
+.modal-close {
   background: none; border: none; color: var(--text-4);
   cursor: pointer; font-size: 18px; padding: 2px 6px;
   border-radius: 6px; line-height: 1;
 }
-#manage-close:hover { color: var(--text); background: var(--conv-hover); }
+#manage-close:hover,
+.modal-close:hover { color: var(--text); background: var(--conv-hover); }
 
+/* ── Body ────────────────────────────────────────────── */
 #manage-body {
   flex: 1;
   overflow-y: auto;
-  padding: 8px 12px;
+  padding: 6px 10px;
 }
+#manage-body::-webkit-scrollbar { width: 4px; }
+#manage-body::-webkit-scrollbar-track { background: transparent; }
+#manage-body::-webkit-scrollbar-thumb { background: var(--scrollbar-sm); border-radius: 2px; }
 
+/* ── Model row ───────────────────────────────────────── */
 .mm-row {
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 10px 8px;
-  border-radius: 8px;
-  transition: background 0.1s;
+  gap: 10px;
+  padding: 8px 10px;
+  border-radius: 10px;
+  transition: background 0.12s;
 }
 .mm-row:hover { background: var(--conv-hover); }
 
+/* ── Status icon ─────────────────────────────────────── */
 .mm-icon {
-  width: 32px; height: 32px;
+  width: 30px; height: 30px;
   border-radius: 8px;
   display: flex; align-items: center; justify-content: center;
   flex-shrink: 0;
-  font-size: 14px;
+  font-size: 13px;
+  font-weight: 600;
 }
-.mm-icon.installed  { background: var(--primary-bg-subtle); color: var(--primary); }
-.mm-icon.available  { background: var(--border); color: var(--text-4); }
-.mm-icon.pulling    { background: var(--primary-bg-subtle); color: var(--primary); }
+.mm-icon.installed { background: var(--primary-bg-subtle); color: var(--primary); }
+.mm-icon.available { background: var(--border); color: var(--text-5); }
+.mm-icon.pulling   { background: var(--primary-bg-subtle); color: var(--primary); }
 
-.mm-info {
+/* ── Model info (non-pulling) ────────────────────────── */
+.mm-body {
   flex: 1;
   min-width: 0;
   display: flex;
-  flex-direction: column;
-  gap: 2px;
+  align-items: center;
+  gap: 10px;
+}
+.mm-details {
+  flex: 1;
+  min-width: 0;
 }
 .mm-name {
   font-size: 13px;
@@ -83,74 +98,140 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  line-height: 1.4;
 }
-.mm-meta {
-  font-size: 11px;
+.mm-meta-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 1px;
+}
+.mm-size {
+  font-size: 10px;
   color: var(--text-5);
 }
+.mm-status {
+  font-size: 10px;
+  font-weight: 500;
+  padding: 1px 6px;
+  border-radius: 4px;
+}
+.mm-status.active {
+  background: var(--primary-bg-subtle);
+  color: var(--primary);
+}
+.mm-status.installed {
+  background: var(--border);
+  color: var(--text-4);
+}
 
+/* ── Progress (pulling/paused) ───────────────────────── */
 .mm-progress {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
   flex: 1;
   min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
 }
 .mm-progress-top {
   display: flex;
-  justify-content: space-between;
   align-items: center;
+  justify-content: space-between;
+  gap: 8px;
 }
-.mm-progress .model-pull-bar-track {
-  height: 3px;
+.mm-progress-name {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-2);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.mm-progress-pct {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-3);
+  flex-shrink: 0;
+}
+.mm-progress-bar {
+  width: 100%;
+  height: 4px;
+  background: var(--border);
+  border-radius: 2px;
+  overflow: hidden;
+}
+.mm-progress-fill {
+  height: 100%;
+  border-radius: 2px;
+  background: var(--primary);
+  transition: width 0.3s ease;
+}
+.mm-progress-fill.paused {
+  background: var(--text-5);
 }
 .mm-progress-stats {
   font-size: 10px;
   color: var(--text-6);
+  display: flex;
+  gap: 4px;
 }
 
-.mm-action, .mm-actions {
+/* ── Action buttons ──────────────────────────────────── */
+.mm-actions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
   flex-shrink: 0;
 }
-.mm-action button,
-.mm-actions button:not(.mm-btn-delete) {
+.mm-btn {
   background: none;
   border: 1px solid var(--border-strong);
-  color: var(--text-4);
+  color: var(--text-3);
   font-size: 11px;
+  font-weight: 500;
   padding: 4px 10px;
   border-radius: 6px;
   cursor: pointer;
   transition: all 0.15s;
+  white-space: nowrap;
 }
-.mm-action button:hover,
-.mm-actions button:not(.mm-btn-delete):hover {
+.mm-btn:hover {
   color: var(--text);
   border-color: var(--primary);
+  background: var(--primary-bg-subtle);
 }
-.mm-btn-delete {
+.mm-btn.primary {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: var(--primary-text);
+}
+.mm-btn.primary:hover {
+  background: var(--primary-hover);
+  border-color: var(--primary-hover);
+}
+.mm-trash {
   background: none !important;
   border: none !important;
   color: var(--text-6) !important;
-  padding: 4px !important;
-  width: 26px; height: 26px;
+  padding: 3px !important;
+  width: 24px; height: 24px;
   display: flex; align-items: center; justify-content: center;
   border-radius: 6px;
   cursor: pointer;
   transition: color 0.15s, background 0.15s;
+  opacity: 0;
 }
-.mm-btn-delete:hover {
+.mm-row:hover .mm-trash { opacity: 1; }
+.mm-trash:hover {
   color: var(--error-text) !important;
   background: var(--error-bg) !important;
 }
-.mm-btn-delete svg { width: 13px; height: 13px; }
-.mm-actions {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  flex-shrink: 0;
-}
+.mm-trash svg { width: 12px; height: 12px; }
 
+/* Always show trash when pulling/paused (no hover needed) */
+.mm-row .mm-actions-pull .mm-trash { opacity: 1; }
+
+/* ── Footer / Search ─────────────────────────────────── */
 #manage-footer {
   padding: 10px 12px;
   border-top: 1px solid var(--border);
@@ -179,6 +260,7 @@
 }
 #manage-add-input::placeholder { color: var(--text-6); }
 
+/* ── Suggestions popup ───────────────────────────────── */
 #manage-suggestions {
   display: none;
   position: absolute;
