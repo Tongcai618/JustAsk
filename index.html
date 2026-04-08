@@ -209,9 +209,16 @@
       color: var(--text);
       height: 100vh;
       display: flex;
-      flex-direction: row;
+      flex-direction: column;
       overflow: hidden;
       transition: background 0.25s, color 0.25s;
+    }
+
+    #app-body {
+      display: flex;
+      flex-direction: row;
+      flex: 1;
+      overflow: hidden;
     }
 
     /* ── Sidebar ─────────────────────────────────────────────── */
@@ -229,7 +236,6 @@
     #sidebar-header {
       padding: 14px 16px;
       border-bottom: 1px solid var(--border);
-      -webkit-app-region: drag;
     }
 
     #new-chat-btn {
@@ -328,9 +334,9 @@
     }
 
     header {
-      padding: 14px 24px;
-      background: var(--surface);
-      border-bottom: 1px solid var(--border-mid);
+      padding: 14px 24px 14px 84px;
+      background: var(--primary);
+      border-bottom: 1px solid var(--primary-hover);
       display: flex;
       align-items: center;
       gap: 10px;
@@ -340,8 +346,8 @@
     }
 
     header .model-badge {
-      background: var(--badge-bg);
-      color: var(--badge-text);
+      background: rgba(255,255,255,0.15);
+      color: var(--primary-text);
       font-size: 12px;
       font-weight: 600;
       padding: 3px 10px;
@@ -352,7 +358,7 @@
     header h1 {
       font-size: 16px;
       font-weight: 600;
-      color: var(--text-2);
+      color: var(--primary-text);
     }
 
     #messages {
@@ -974,6 +980,13 @@
 </head>
 <body>
 
+  <header>
+    <h1>JustAsk</h1>
+    <span class="model-badge">gemma4:e2b</span>
+  </header>
+
+  <div id="app-body">
+
   <!-- Sidebar -->
   <div id="sidebar">
     <div id="sidebar-header">
@@ -1410,11 +1423,6 @@ const response = await fetch('/api/chat', {
 
   <!-- Main chat area -->
   <div id="main">
-    <header>
-      <h1>JustAsk</h1>
-      <span class="model-badge">gemma4:e2b</span>
-    </header>
-
     <div id="messages">
       <div class="empty-state" id="empty-state">
         <div class="icon">&#9670;</div>
@@ -1435,6 +1443,8 @@ const response = await fetch('/api/chat', {
       </div>
     </div>
   </div>
+
+  </div><!-- #app-body -->
 
   <script>
     // ── Config ───────────────────────────────────────────────

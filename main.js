@@ -143,7 +143,9 @@ function createWindow() {
     width: 1100,
     height: 700,
     title: 'JustAsk',
-    backgroundColor: '#0d0d0d',
+    titleBarStyle: 'hiddenInset',
+    trafficLightPosition: { x: 16, y: 16 },
+    backgroundColor: '#7b9669',
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
       contextIsolation: true,
