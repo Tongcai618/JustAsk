@@ -42,11 +42,15 @@ export default function ManageModelsModal({ isOpen, onClose }) {
 
   const [query, setQuery] = useState('');
   const [showSuggestions, setShowSuggestions] = useState(false);
+  const [confirmDelete, setConfirmDelete] = useState(null); // model name or null
   const footerRef = useRef(null);
   const inputRef = useRef(null);
 
   useEffect(() => {
-    if (isOpen) fetchLocalModels();
+    if (isOpen) {
+      fetchLocalModels();
+      setConfirmDelete(null);
+    }
   }, [isOpen, fetchLocalModels]);
 
   useEffect(() => {
@@ -153,6 +157,41 @@ export default function ManageModelsModal({ isOpen, onClose }) {
     /* ── Normal row (installed / available) ── */
     const info = localModelInfo[model];
     const sizeStr = isInstalled && info ? formatBytes(info.size || 0) : '';
+    const isConfirming = confirmDelete === model;
+
+    /* ── Confirm delete row ── */
+    if (isConfirming) {
+      return (
+        <div className="mm-row mm-row-confirm" key={model}>
+          <div className="mm-icon" style={{ background: 'var(--error-bg)', color: 'var(--error-text)' }}>!</div>
+          <div className="mm-body">
+            <div className="mm-details">
+              <div className="mm-name">Delete {model}?</div>
+              <div className="mm-meta-row">
+                <span className="mm-size">This will remove the model from Ollama</span>
+              </div>
+            </div>
+            <div className="mm-actions">
+              <button
+                className="mm-btn"
+                onClick={() => setConfirmDelete(null)}
+              >
+                Cancel
+              </button>
+              <button
+                className="mm-btn mm-btn-danger"
+                onClick={() => {
+                  deleteModel(model);
+                  setConfirmDelete(null);
+                }}
+              >
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      );
+    }
 
     return (
       <div className="mm-row" key={model}>
@@ -193,7 +232,7 @@ export default function ManageModelsModal({ isOpen, onClose }) {
             ) : isActive ? (
               <button
                 className="mm-trash"
-                onClick={() => deleteModel(model)}
+                onClick={() => setConfirmDelete(model)}
               >
                 <TrashIcon />
               </button>
@@ -209,7 +248,7 @@ export default function ManageModelsModal({ isOpen, onClose }) {
                 </button>
                 <button
                   className="mm-trash"
-                  onClick={() => deleteModel(model)}
+                  onClick={() => setConfirmDelete(model)}
                 >
                   <TrashIcon />
                 </button>

@@ -129,9 +129,9 @@ export default function Playground({ visible }) {
           <div className="pg-section-title">Badges &amp; Chips</div>
           <div className="pg-row">
             <div className="pg-atom">
-              <div className="pg-atom-label">Model Badge</div>
+              <div className="pg-atom-label">Model Button</div>
               <div className="pg-atom-render">
-                <span className="model-badge">gemma4:e2b</span>
+                <button id="pg-model-btn" className="header-btn">gemma4:e2b</button>
               </div>
             </div>
             <div className="pg-atom">
@@ -161,14 +161,14 @@ export default function Playground({ visible }) {
             <div className="pg-atom">
               <div className="pg-atom-label">Input Field</div>
               <div className="pg-atom-render">
-                <div className="pg-field-wrap">
-                  <span className="pg-field-label">Model name</span>
+                <div style={{ width: '220px', display: 'flex', flexDirection: 'column', gap: '5px' }}>
+                  <span style={{ fontSize: '12px', color: 'var(--text-3)', fontWeight: 500 }}>Model name</span>
                   <input
-                    className="pg-field-input"
+                    className="field-input"
                     placeholder="e.g. gemma4:e2b"
                     readOnly
                   />
-                  <span className="pg-field-hint">
+                  <span style={{ fontSize: '11px', color: 'var(--text-6)' }}>
                     The Ollama model identifier
                   </span>
                 </div>
@@ -177,7 +177,7 @@ export default function Playground({ visible }) {
             <div className="pg-atom">
               <div className="pg-atom-label">Textarea / Chat Input</div>
               <div className="pg-atom-render" style={{ width: '300px' }}>
-                <div className="pg-input-composite">
+                <div className="chat-input-wrap" style={{ flex: 1 }}>
                   <textarea
                     placeholder="Message gemma4:e2b..."
                     rows={1}
@@ -213,7 +213,7 @@ export default function Playground({ visible }) {
             <div className="pg-atom">
               <div className="pg-atom-label">Search Input</div>
               <div className="pg-atom-render">
-                <div className="pg-search-wrap">
+                <div className="search-wrap">
                   <svg
                     viewBox="0 0 24 24"
                     fill="none"
@@ -233,7 +233,7 @@ export default function Playground({ visible }) {
               <div className="pg-atom-label">Search (Focused)</div>
               <div className="pg-atom-render">
                 <div
-                  className="pg-search-wrap"
+                  className="search-wrap"
                   style={{ borderColor: 'var(--primary)' }}
                 >
                   <svg
@@ -624,7 +624,7 @@ export default function Playground({ visible }) {
             <div className="pg-atom" style={{ minWidth: '400px' }}>
               <div className="pg-atom-label">Syntax Highlighted</div>
               <div className="pg-atom-render" style={{ width: '100%' }}>
-                <pre className="pg-code-block">
+                <pre className="code-block">
                   <code>{`const model = "gemma4:e2b";
 const response = await fetch('/api/chat', {
   method: 'POST',
@@ -646,10 +646,10 @@ const response = await fetch('/api/chat', {
                 className="pg-atom-render"
                 style={{ justifyContent: 'center' }}
               >
-                <div className="pg-empty-demo">
+                <div className="empty-state" style={{ pointerEvents: 'auto', flex: 'none', padding: '20px 0' }}>
                   <img className="icon" src="assets/leaf.svg" alt="leaf" />
                   <div>Start a conversation</div>
-                  <div className="pg-empty-hint">
+                  <div className="hint">
                     Shift+Enter for new line &middot; Enter to send
                   </div>
                 </div>
@@ -661,16 +661,7 @@ const response = await fetch('/api/chat', {
                 className="pg-atom-render"
                 style={{ justifyContent: 'center' }}
               >
-                <div
-                  style={{
-                    padding: '16px',
-                    textAlign: 'center',
-                    color: 'var(--text-6)',
-                    fontSize: '12px',
-                  }}
-                >
-                  No conversations yet
-                </div>
+                <div className="no-history">No conversations yet</div>
               </div>
             </div>
           </div>

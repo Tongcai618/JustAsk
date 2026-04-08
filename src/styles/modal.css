@@ -231,13 +231,31 @@
 /* Always show trash when pulling/paused (no hover needed) */
 .mm-row .mm-actions-pull .mm-trash { opacity: 1; }
 
+/* ── Confirm delete row ──────────────────────────────── */
+.mm-row-confirm {
+  background: var(--error-bg);
+  border: 1px solid var(--error-border);
+}
+.mm-row-confirm:hover {
+  background: var(--error-bg);
+}
+.mm-btn-danger {
+  background: var(--error-text) !important;
+  border-color: var(--error-text) !important;
+  color: #fff !important;
+}
+.mm-btn-danger:hover {
+  opacity: 0.85;
+}
+
 /* ── Footer / Search ─────────────────────────────────── */
 #manage-footer {
   padding: 10px 12px;
   border-top: 1px solid var(--border);
   position: relative;
 }
-#manage-search-wrap {
+#manage-search-wrap,
+.search-wrap {
   display: flex;
   align-items: center;
   gap: 8px;
@@ -247,9 +265,12 @@
   padding: 6px 10px;
   transition: border-color 0.15s;
 }
-#manage-search-wrap:focus-within { border-color: var(--primary); }
-#manage-search-wrap svg { width: 14px; height: 14px; color: var(--text-5); flex-shrink: 0; }
-#manage-add-input {
+#manage-search-wrap:focus-within,
+.search-wrap:focus-within { border-color: var(--primary); }
+#manage-search-wrap svg,
+.search-wrap svg { width: 14px; height: 14px; color: var(--text-5); flex-shrink: 0; }
+#manage-add-input,
+.search-wrap input {
   flex: 1;
   background: none;
   border: none;
@@ -258,7 +279,8 @@
   font-family: inherit;
   outline: none;
 }
-#manage-add-input::placeholder { color: var(--text-6); }
+#manage-add-input::placeholder,
+.search-wrap input::placeholder { color: var(--text-6); }
 
 /* ── Suggestions popup ───────────────────────────────── */
 #manage-suggestions {
