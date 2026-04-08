@@ -8,6 +8,7 @@ const OLLAMA_URL = 'http://localhost:11434';
 const PROXY_PORT = 3131;
 
 let mainWindow;
+const activeProcs = {}; // model -> spawned process (for pause support)
 
 // ── History storage ─────────────────────────────────────────────────
 function getHistoryPath() {
@@ -41,6 +42,23 @@ function startProxy() {
       return;
     }
 
+    if (req.method === 'GET' && req.url === '/api/tags') {
+      const tagsReq = http.request(
+        `${OLLAMA_URL}/api/tags`,
+        { method: 'GET' },
+        (tagsRes) => {
+          res.writeHead(200, { 'Content-Type': 'application/json' });
+          tagsRes.pipe(res);
+        }
+      );
+      tagsReq.on('error', (err) => {
+        res.writeHead(500);
+        res.end(JSON.stringify({ error: err.message }));
+      });
+      tagsReq.end();
+      return;
+    }
+
     if (req.method === 'POST' && req.url === '/api/chat') {
       let body = '';
       req.on('data', chunk => { body += chunk; });
@@ -55,7 +73,7 @@ function startProxy() {
         }
 
         const payload = JSON.stringify({
-          model: MODEL,
+          model: data.model || MODEL,
           messages: data.messages || [],
           stream: true,
         });
@@ -180,6 +198,101 @@ ipcMain.handle('delete-conversation', (_event, id) => {
   conversations = conversations.filter(c => c.id !== id);
   writeConversations(conversations);
   return conversations;
+});
+
+ipcMain.handle('pull-model', (_event, model) => {
+  return new Promise((resolve, reject) => {
+    const payload = JSON.stringify({ name: model, stream: true });
+    let paused = false;
+    let settled = false;
+
+    const settle = (fn) => {
+      if (!settled) { settled = true; delete activeProcs[model]; fn(); }
+    };
+
+    const req = http.request(
+      `${OLLAMA_URL}/api/pull`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Content-Length': Buffer.byteLength(payload),
+        },
+      },
+      (res) => {
+        let buf = '';
+
+        res.on('data', (chunk) => {
+          buf += chunk.toString();
+          const lines = buf.split('\n');
+          buf = lines.pop();
+          for (const line of lines) {
+            const trimmed = line.trim();
+            if (!trimmed) continue;
+            try {
+              const parsed = JSON.parse(trimmed);
+              if (mainWindow) mainWindow.webContents.send('pull-progress', { model, ...parsed });
+            } catch { /* skip */ }
+          }
+        });
+
+        res.on('end', () => {
+          settle(() => {
+            if (mainWindow) mainWindow.webContents.send('pull-progress', { model, done: true });
+            resolve(true);
+          });
+        });
+
+        // Fires when req.destroy() is called mid-response
+        res.on('close', () => {
+          settle(() => {
+            if (paused) {
+              if (mainWindow) mainWindow.webContents.send('pull-progress', { model, paused: true });
+              resolve(false);
+            }
+          });
+        });
+
+        res.on('error', () => {
+          settle(() => {
+            if (paused) {
+              if (mainWindow) mainWindow.webContents.send('pull-progress', { model, paused: true });
+              resolve(false);
+            } else {
+              if (mainWindow) mainWindow.webContents.send('pull-progress', { model, done: true, error: true });
+              reject(new Error('Response error'));
+            }
+          });
+        });
+      }
+    );
+
+    activeProcs[model] = {
+      pause: () => { paused = true; req.destroy(); },
+    };
+
+    // Fires when req.destroy() is called before response arrives
+    req.on('error', (err) => {
+      settle(() => {
+        if (paused) {
+          if (mainWindow) mainWindow.webContents.send('pull-progress', { model, paused: true });
+          resolve(false);
+        } else {
+          if (mainWindow) mainWindow.webContents.send('pull-progress', { model, done: true, error: true });
+          reject(err);
+        }
+      });
+    });
+
+    req.write(payload);
+    req.end();
+  });
+});
+
+ipcMain.handle('pause-pull', (_event, model) => {
+  const proc = activeProcs[model];
+  if (proc) proc.pause();
+  return true;
 });
 
 // ── App lifecycle ────────────────────────────────────────────────────

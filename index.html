@@ -311,13 +311,6 @@
     .conv-item:hover .conv-delete { display: block; }
     .conv-item .conv-delete:hover { color: var(--conv-delete-hover); }
 
-    #sidebar-footer {
-      padding: 10px 16px;
-      border-top: 1px solid var(--border);
-      font-size: 11px;
-      color: var(--text-6);
-      text-align: center;
-    }
 
 
     /* ── Main area ───────────────────────────────────────────── */
@@ -340,7 +333,13 @@
       transition: background 0.25s, border-color 0.25s;
     }
 
-    header .model-badge {
+    /* ── Model dropdown ──────────────────────────────────────── */
+    #model-dropdown-wrap {
+      position: relative;
+      -webkit-app-region: no-drag;
+    }
+
+    #model-btn {
       background: rgba(255,255,255,0.15);
       color: var(--primary-text);
       font-size: 12px;
@@ -348,6 +347,120 @@
       padding: 3px 10px;
       border-radius: 20px;
       letter-spacing: 0.4px;
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      transition: background 0.15s;
+    }
+    #model-btn:hover { background: rgba(255,255,255,0.25); }
+    #model-btn svg { width: 10px; height: 10px; opacity: 0.8; }
+
+    #model-menu {
+      display: none;
+      position: absolute;
+      top: calc(100% + 8px);
+      left: 0;
+      background: var(--surface);
+      border: 1px solid var(--border-strong);
+      border-radius: 10px;
+      padding: 6px;
+      min-width: 220px;
+      z-index: 100;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.25);
+    }
+    #model-menu.open { display: block; }
+
+    .model-option {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 10px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 13px;
+      color: var(--text-2);
+      transition: background 0.1s;
+    }
+    .model-option:hover { background: var(--conv-hover); }
+    .model-option.selected { color: var(--primary); font-weight: 600; }
+    .model-option .check {
+      width: 14px;
+      height: 14px;
+      flex-shrink: 0;
+      color: var(--primary);
+      visibility: hidden;
+    }
+    .model-option.selected .check { visibility: visible; }
+    .model-option.not-installed { color: var(--text-4); }
+    .model-option.not-installed:hover { background: var(--conv-hover); }
+    .model-option.not-installed .model-plus {
+      font-size: 13px;
+      color: var(--text-4);
+      flex-shrink: 0;
+      width: 14px;
+      text-align: center;
+    }
+    .model-option.pulling,
+    .model-option.paused { cursor: default; padding: 10px 10px; align-items: center; }
+    .model-pull-progress {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      min-width: 0;
+    }
+    .model-pull-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 6px;
+    }
+    .model-pull-name { font-size: 12px; color: var(--text-4); }
+    .model-pull-pct  { font-size: 11px; color: var(--text-5); flex-shrink: 0; }
+    .model-pull-bar-track {
+      height: 3px;
+      background: var(--border);
+      border-radius: 2px;
+      overflow: hidden;
+    }
+    .model-pull-bar-fill {
+      height: 100%;
+      background: var(--primary);
+      border-radius: 2px;
+      transition: width 0.25s ease;
+      width: 0%;
+    }
+    @keyframes pull-shimmer {
+      0%   { transform: translateX(-150%); }
+      100% { transform: translateX(400%); }
+    }
+    .model-pull-bar-fill.indeterminate {
+      width: 30% !important;
+      animation: pull-shimmer 1.2s ease-in-out infinite;
+    }
+    .model-option.paused { color: var(--text-4); }
+    .model-pull-action {
+      flex-shrink: 0;
+      width: 20px; height: 20px;
+      border: none;
+      background: none;
+      color: var(--text-3);
+      cursor: pointer;
+      border-radius: 4px;
+      display: flex; align-items: center; justify-content: center;
+      padding: 0;
+      transition: color 0.15s, background 0.15s;
+      -webkit-app-region: no-drag;
+    }
+    .model-pull-action:hover { color: var(--text); background: var(--border); }
+    .model-pull-action svg { width: 11px; height: 11px; }
+
+    .model-menu-divider {
+      border: none;
+      border-top: 1px solid var(--border);
+      margin: 4px 0;
     }
 
     header h1 {
@@ -982,7 +1095,15 @@
 
   <header>
     <h1>JustAsk</h1>
-    <span class="model-badge">gemma4:e2b</span>
+    <div id="model-dropdown-wrap">
+      <button id="model-btn" onclick="toggleModelMenu()">
+        <span id="model-btn-label">gemma4:e2b</span>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="6 9 12 15 18 9"></polyline>
+        </svg>
+      </button>
+      <div id="model-menu"></div>
+    </div>
     <div class="header-spacer"></div>
     <button id="playground-toggle" class="header-btn" onclick="togglePlayground()">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -1026,9 +1147,6 @@
       </button>
     </div>
     <div id="conversation-list"></div>
-    <div id="sidebar-footer">
-      <div style="color:var(--text-6); font-size:11px; text-align:center;">Conversations saved locally</div>
-    </div>
   </div>
 
   <!-- Playground -->
@@ -1456,6 +1574,13 @@ const response = await fetch('/api/chat', {
     let conversations = [];
     let pendingNewChat = false;
 
+    const MODELS = ['gemma4:e2b', 'gemma4:e4b'];
+    let currentModel = localStorage.getItem('model') || MODELS[0];
+    let localModels = new Set();
+    let pullingModels = new Set();
+    let pullProgress = {}; // model -> { pct: 0-100, label: string }
+    let pausedModels = {}; // model -> { pct, label } at time of pause
+
     // ── DOM refs ─────────────────────────────────────────────
     const messagesEl = document.getElementById('messages');
     const promptEl = document.getElementById('prompt');
@@ -1498,6 +1623,216 @@ const response = await fetch('/api/chat', {
         if (!isStreaming) sendMessage();
       }
     });
+
+    // ── Model dropdown ───────────────────────────────────────
+    const modelMenu = document.getElementById('model-menu');
+    const modelBtnLabel = document.getElementById('model-btn-label');
+
+    async function fetchLocalModels() {
+      try {
+        const port = await window.electronAPI.getProxyPort();
+        const res = await fetch(`http://127.0.0.1:${port}/api/tags`);
+        const data = await res.json();
+        localModels = new Set((data.models || []).map(m => m.name));
+      } catch {
+        localModels = new Set();
+      }
+      renderModelMenu();
+    }
+
+    function makeActionBtn(svgPath, title, onClick) {
+      const btn = document.createElement('button');
+      btn.className = 'model-pull-action';
+      btn.title = title;
+      btn.innerHTML = `<svg viewBox="0 0 24 24" fill="currentColor"><path d="${svgPath}"/></svg>`;
+      btn.onclick = (e) => { e.stopPropagation(); onClick(); };
+      return btn;
+    }
+
+    function renderModelMenu() {
+      modelMenu.innerHTML = '';
+      for (const m of MODELS) {
+        const installed = localModels.size === 0 || localModels.has(m);
+        const pulling  = pullingModels.has(m);
+        const paused   = !!pausedModels[m];
+
+        const opt = document.createElement('div');
+
+        if (pulling) {
+          opt.className = 'model-option pulling';
+        } else if (paused) {
+          opt.className = 'model-option paused';
+        } else if (!installed) {
+          opt.className = 'model-option not-installed';
+          opt.onclick = () => pullModel(m);
+        } else {
+          opt.className = 'model-option' + (m === currentModel ? ' selected' : '');
+          opt.onclick = () => selectModel(m);
+        }
+
+        if (pulling || paused) {
+          const safeId = m.replace(/[^a-z0-9]/gi, '_');
+          const prog = (pulling ? pullProgress[m] : pausedModels[m]) || { pct: 0, label: '…' };
+          const indeterminate = pulling && prog.pct === 0;
+          const pctDisplay = prog.pct > 0 ? `${prog.pct}%` : prog.label;
+
+          // Left icon: ↓ when downloading, ⏸ when paused
+          const icon = document.createElement('span');
+          icon.className = 'model-plus';
+          icon.textContent = paused ? '⏸' : '↓';
+
+          // Progress container
+          const wrap = document.createElement('div');
+          wrap.className = 'model-pull-progress';
+          wrap.innerHTML = `
+            <div class="model-pull-top">
+              <span class="model-pull-name">${m}</span>
+              <span class="model-pull-pct" id="pull-pct-${safeId}">${paused ? (prog.pct > 0 ? 'Paused · ' + prog.pct + '%' : 'Paused') : pctDisplay}</span>
+            </div>
+            <div class="model-pull-bar-track">
+              <div class="model-pull-bar-fill${indeterminate ? ' indeterminate' : ''}"
+                   id="pull-bar-${safeId}"
+                   style="width:${indeterminate ? '30' : prog.pct}%"></div>
+            </div>`;
+
+          // Right action button: pause or resume
+          const actionBtn = paused
+            ? makeActionBtn('M8 5v14l11-7z', 'Resume', () => resumePull(m))
+            : makeActionBtn('M6 19h4V5H6v14zm8-14v14h4V5h-4z', 'Pause', () => pausePull(m));
+
+          opt.appendChild(icon);
+          opt.appendChild(wrap);
+          opt.appendChild(actionBtn);
+        } else if (!installed) {
+          const plus = document.createElement('span');
+          plus.className = 'model-plus';
+          plus.textContent = '+';
+          const label = document.createElement('span');
+          label.textContent = m;
+          opt.appendChild(plus);
+          opt.appendChild(label);
+        } else {
+          const check = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+          check.setAttribute('class', 'check');
+          check.setAttribute('viewBox', '0 0 24 24');
+          check.setAttribute('fill', 'none');
+          check.setAttribute('stroke', 'currentColor');
+          check.setAttribute('stroke-width', '2.5');
+          check.setAttribute('stroke-linecap', 'round');
+          check.setAttribute('stroke-linejoin', 'round');
+          check.innerHTML = '<polyline points="20 6 9 17 4 12"></polyline>';
+          const label = document.createElement('span');
+          label.textContent = m;
+          opt.appendChild(check);
+          opt.appendChild(label);
+        }
+
+        modelMenu.appendChild(opt);
+      }
+    }
+
+    async function pullModel(model) {
+      delete pausedModels[model];
+      pullingModels.add(model);
+      pullProgress[model] = pullProgress[model] || { pct: 0, label: 'Preparing…' };
+      renderModelMenu();
+      try {
+        await window.electronAPI.pullModel(model);
+      } catch (err) {
+        console.error('Pull failed:', err);
+      } finally {
+        if (pullingModels.has(model)) {
+          pullingModels.delete(model);
+          delete pullProgress[model];
+          fetchLocalModels();
+        }
+      }
+    }
+
+    function pausePull(model) {
+      window.electronAPI.pausePull(model);
+      // UI update happens when the paused event arrives
+    }
+
+    function resumePull(model) {
+      pullModel(model);
+    }
+
+    // ── Pull progress events ─────────────────────────────────
+    window.electronAPI.onPullProgress((data) => {
+      const { model, status, total, completed, done, paused } = data;
+
+      if (paused) {
+        pullingModels.delete(model);
+        pausedModels[model] = pullProgress[model] || { pct: 0, label: 'Paused' };
+        delete pullProgress[model];
+        renderModelMenu();
+        return;
+      }
+
+      if (done) {
+        pullingModels.delete(model);
+        delete pullProgress[model];
+        delete pausedModels[model];
+        fetchLocalModels();
+        return;
+      }
+
+      let pct = pullProgress[model]?.pct || 0;
+      let label = '…';
+
+      if (total && completed) {
+        pct = Math.round((completed / total) * 100);
+        label = `${pct}%`;
+      } else if (status === 'pulling manifest') {
+        label = 'Preparing…';
+      } else if (status && status.startsWith('verifying')) {
+        pct = 95; label = 'Verifying…';
+      } else if (status && status.startsWith('writing')) {
+        pct = 98; label = 'Finalizing…';
+      } else if (status) {
+        label = status;
+      }
+
+      pullProgress[model] = { pct, label };
+
+      // Update bar and label in-place
+      const safeId = model.replace(/[^a-z0-9]/gi, '_');
+      const barEl = document.getElementById(`pull-bar-${safeId}`);
+      const pctEl = document.getElementById(`pull-pct-${safeId}`);
+      if (barEl) {
+        barEl.classList.remove('indeterminate');
+        barEl.style.width = `${pct}%`;
+      }
+      if (pctEl) pctEl.textContent = pct > 0 ? `${pct}%` : label;
+    });
+
+    function toggleModelMenu() {
+      const willOpen = !modelMenu.classList.contains('open');
+      modelMenu.classList.toggle('open');
+      if (willOpen) fetchLocalModels();
+    }
+
+    function selectModel(model) {
+      currentModel = model;
+      localStorage.setItem('model', model);
+      modelBtnLabel.textContent = model;
+      promptEl.placeholder = `Message ${model}\u2026`;
+      modelMenu.classList.remove('open');
+      renderModelMenu();
+    }
+
+    // Close menu when clicking outside
+    document.addEventListener('click', (e) => {
+      if (!document.getElementById('model-dropdown-wrap').contains(e.target)) {
+        modelMenu.classList.remove('open');
+      }
+    });
+
+    // Init dropdown
+    modelBtnLabel.textContent = currentModel;
+    promptEl.placeholder = `Message ${currentModel}\u2026`;
+    fetchLocalModels();
 
     // ── Theme toggle ─────────────────────────────────────────
     function applyTheme(theme) {
@@ -1710,7 +2045,7 @@ const response = await fetch('/api/chat', {
         const resp = await fetch(`${API_BASE}/api/chat`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ messages: history })
+          body: JSON.stringify({ messages: history, model: currentModel })
         });
 
         if (!resp.ok) throw new Error(`Server error: ${resp.status}`);
