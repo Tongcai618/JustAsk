@@ -238,7 +238,8 @@
       border-bottom: 1px solid var(--border);
     }
 
-    #new-chat-btn {
+    /* ── Shared component classes ─────────────────────────── */
+    .btn-full {
       width: 100%;
       padding: 9px 14px;
       background: var(--primary);
@@ -251,11 +252,106 @@
       display: flex;
       align-items: center;
       gap: 8px;
+      justify-content: center;
       transition: background 0.15s;
-      -webkit-app-region: no-drag;
     }
-    #new-chat-btn:hover { background: var(--primary-hover); }
-    #new-chat-btn svg { width: 14px; height: 14px; flex-shrink: 0; }
+    .btn-full:hover { background: var(--primary-hover); }
+    .btn-full svg { width: 14px; height: 14px; flex-shrink: 0; }
+
+    .btn-primary {
+      padding: 9px 18px;
+      background: var(--primary);
+      color: var(--primary-text);
+      border: none;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+    .btn-primary:hover { background: var(--primary-hover); }
+    .btn-primary:disabled { background: var(--disabled-bg); color: var(--disabled-text); cursor: default; }
+
+    .btn-ghost {
+      background: none;
+      border: 1px solid var(--border-strong);
+      color: var(--text-5);
+      font-size: 12px;
+      padding: 5px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+    .btn-ghost:hover { background: var(--conv-hover); }
+
+    .btn-ghost-sm {
+      background: none;
+      border: 1px solid var(--border-strong);
+      color: var(--text-5);
+      font-size: 14px;
+      padding: 2px 6px;
+      border-radius: 4px;
+      cursor: pointer;
+      line-height: 1;
+      transition: background 0.15s;
+    }
+    .btn-ghost-sm:hover { background: var(--conv-hover); }
+
+    .field-input {
+      background: var(--card);
+      border: 1px solid var(--border-strong);
+      color: var(--text);
+      font-size: 13px;
+      padding: 8px 12px;
+      border-radius: 8px;
+      outline: none;
+      width: 100%;
+      box-sizing: border-box;
+      transition: border-color 0.15s;
+    }
+    .field-input:focus { border-color: var(--primary); }
+
+    .chat-input-wrap {
+      display: flex;
+      align-items: flex-end;
+      gap: 10px;
+      background: var(--card);
+      border: 1px solid var(--border-input);
+      border-radius: 14px;
+      padding: 6px 12px 10px;
+      transition: border-color 0.2s, background 0.25s;
+    }
+    .chat-input-wrap:focus-within { border-color: var(--primary); }
+    .chat-input-wrap textarea {
+      flex: 1;
+      background: none;
+      border: none;
+      outline: none;
+      color: var(--text);
+      font-size: 14.5px;
+      font-family: inherit;
+      line-height: 1.5;
+      resize: none;
+      min-height: 24px;
+    }
+
+    .code-block {
+      background: var(--code-bg);
+      border: 1px solid var(--asst-bubble-border);
+      border-radius: 8px;
+      padding: 14px 16px;
+      overflow-x: auto;
+      width: 100%;
+      margin: 0;
+    }
+    .code-block code {
+      font-family: "SF Mono", "Fira Code", Consolas, monospace;
+      font-size: 13px;
+      color: var(--code-text);
+    }
+
+    /* Real elements reference shared classes; ID overrides only what's unique */
+    #new-chat-btn { -webkit-app-region: no-drag; }
 
     #conversation-list {
       flex: 1;
@@ -419,6 +515,12 @@
     }
     .model-pull-name { font-size: 12px; color: var(--text-4); }
     .model-pull-pct  { font-size: 11px; color: var(--text-5); flex-shrink: 0; }
+    .model-pull-stats {
+      font-size: 10px;
+      color: var(--text-6);
+      letter-spacing: 0.01em;
+      min-height: 13px;
+    }
     .model-pull-bar-track {
       height: 3px;
       background: var(--border);
@@ -462,6 +564,231 @@
       border-top: 1px solid var(--border);
       margin: 4px 0;
     }
+
+    /* ── Manage Models modal ──────────────────────────────── */
+    #manage-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 200;
+      background: rgba(0,0,0,0.55);
+      align-items: center;
+      justify-content: center;
+    }
+    #manage-overlay.open { display: flex; }
+
+    #manage-modal {
+      background: var(--surface);
+      border: 1px solid var(--border-strong);
+      border-radius: 14px;
+      width: 520px;
+      max-height: 80vh;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.35);
+      overflow: hidden;
+    }
+
+    #manage-header {
+      padding: 18px 20px 14px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    #manage-header h2 {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--text);
+      margin: 0;
+    }
+    #manage-close {
+      background: none; border: none; color: var(--text-4);
+      cursor: pointer; font-size: 18px; padding: 2px 6px;
+      border-radius: 6px; line-height: 1;
+    }
+    #manage-close:hover { color: var(--text); background: var(--conv-hover); }
+
+    #manage-body {
+      flex: 1;
+      overflow-y: auto;
+      padding: 8px 12px;
+    }
+
+    .mm-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 8px;
+      border-radius: 8px;
+      transition: background 0.1s;
+    }
+    .mm-row:hover { background: var(--conv-hover); }
+
+    .mm-icon {
+      width: 32px; height: 32px;
+      border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+      font-size: 14px;
+    }
+    .mm-icon.installed  { background: var(--primary-bg-subtle); color: var(--primary); }
+    .mm-icon.available  { background: var(--border); color: var(--text-4); }
+    .mm-icon.pulling    { background: var(--primary-bg-subtle); color: var(--primary); }
+
+    .mm-info {
+      flex: 1;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+    .mm-name {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .mm-meta {
+      font-size: 11px;
+      color: var(--text-5);
+    }
+
+    .mm-progress {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      flex: 1;
+      min-width: 0;
+    }
+    .mm-progress-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .mm-progress .model-pull-bar-track {
+      height: 3px;
+    }
+    .mm-progress-stats {
+      font-size: 10px;
+      color: var(--text-6);
+    }
+
+    .mm-action, .mm-actions {
+      flex-shrink: 0;
+    }
+    .mm-action button,
+    .mm-actions button:not(.mm-btn-delete) {
+      background: none;
+      border: 1px solid var(--border-strong);
+      color: var(--text-4);
+      font-size: 11px;
+      padding: 4px 10px;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .mm-action button:hover,
+    .mm-actions button:not(.mm-btn-delete):hover {
+      color: var(--text);
+      border-color: var(--primary);
+    }
+    .mm-btn-delete {
+      background: none !important;
+      border: none !important;
+      color: var(--text-6) !important;
+      padding: 4px !important;
+      width: 26px; height: 26px;
+      display: flex; align-items: center; justify-content: center;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: color 0.15s, background 0.15s;
+    }
+    .mm-btn-delete:hover {
+      color: var(--error-text) !important;
+      background: var(--error-bg) !important;
+    }
+    .mm-btn-delete svg { width: 13px; height: 13px; }
+    .mm-actions {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-shrink: 0;
+    }
+
+    #manage-footer {
+      padding: 10px 12px;
+      border-top: 1px solid var(--border);
+      position: relative;
+    }
+    #manage-search-wrap {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--card);
+      border: 1px solid var(--border-input);
+      border-radius: 8px;
+      padding: 6px 10px;
+      transition: border-color 0.15s;
+    }
+    #manage-search-wrap:focus-within { border-color: var(--primary); }
+    #manage-search-wrap svg { width: 14px; height: 14px; color: var(--text-5); flex-shrink: 0; }
+    #manage-add-input {
+      flex: 1;
+      background: none;
+      border: none;
+      color: var(--text);
+      font-size: 12px;
+      font-family: inherit;
+      outline: none;
+    }
+    #manage-add-input::placeholder { color: var(--text-6); }
+
+    #manage-suggestions {
+      display: none;
+      position: absolute;
+      left: 12px; right: 12px;
+      bottom: calc(100% + 4px);
+      background: var(--surface);
+      border: 1px solid var(--border-strong);
+      border-radius: 10px;
+      padding: 4px;
+      max-height: 240px;
+      overflow-y: auto;
+      box-shadow: 0 -8px 24px rgba(0,0,0,0.2);
+      z-index: 10;
+    }
+    #manage-suggestions.open { display: block; }
+
+    .ms-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 10px;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background 0.1s;
+    }
+    .ms-item:hover { background: var(--conv-hover); }
+    .ms-info { flex: 1; min-width: 0; }
+    .ms-name { font-size: 12px; font-weight: 500; color: var(--text); }
+    .ms-desc { font-size: 10px; color: var(--text-5); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .ms-sizes { font-size: 10px; color: var(--text-6); flex-shrink: 0; text-align: right; }
+    .ms-installed {
+      font-size: 10px; color: var(--primary); font-weight: 500; flex-shrink: 0;
+    }
+    .ms-custom {
+      font-size: 11px; color: var(--text-4); padding: 8px 10px;
+      border-top: 1px solid var(--border);
+      margin-top: 2px;
+      cursor: pointer;
+      border-radius: 0 0 6px 6px;
+      transition: background 0.1s;
+    }
+    .ms-custom:hover { background: var(--conv-hover); }
+    .ms-custom strong { color: var(--text-2); }
 
     header h1 {
       font-size: 16px;
@@ -623,18 +950,7 @@
       transition: background 0.25s, border-color 0.25s;
     }
 
-    #input-wrap {
-      display: flex;
-      align-items: flex-end;
-      gap: 10px;
-      background: var(--card);
-      border: 1px solid var(--border-input);
-      border-radius: 14px;
-      padding: 6px 12px 10px;
-      transition: border-color 0.2s, background 0.25s;
-    }
-
-    #input-wrap:focus-within { border-color: var(--primary); }
+    /* #input-wrap and #prompt inherit from .chat-input-wrap / .chat-input-wrap textarea */
 
     #prompt {
       flex: 1;
@@ -652,7 +968,7 @@
 
     #prompt::placeholder { color: var(--text-5); }
 
-    #send-btn {
+    .btn-icon {
       background: var(--primary);
       color: var(--primary-text);
       border: none;
@@ -666,10 +982,9 @@
       flex-shrink: 0;
       transition: background 0.15s;
     }
-
-    #send-btn:hover { background: var(--primary-hover); }
-    #send-btn:disabled { background: var(--disabled-bg); color: var(--disabled-text); cursor: default; }
-    #send-btn svg { width: 16px; height: 16px; }
+    .btn-icon:hover { background: var(--primary-hover); }
+    .btn-icon:disabled { background: var(--disabled-bg); color: var(--disabled-text); cursor: default; }
+    .btn-icon svg { width: 16px; height: 16px; }
 
     .empty-state {
       flex: 1;
@@ -811,18 +1126,6 @@
 
     .pg-field-wrap { width: 260px; display: flex; flex-direction: column; gap: 5px; }
     .pg-field-label { font-size: 12px; color: var(--text-3); font-weight: 500; }
-    .pg-field-input {
-      background: var(--card);
-      border: 1px solid var(--border-input);
-      border-radius: 8px;
-      padding: 8px 12px;
-      color: var(--text);
-      font-size: 13px;
-      font-family: inherit;
-      outline: none;
-      transition: border-color 0.2s, background 0.25s;
-    }
-    .pg-field-input:focus { border-color: var(--primary); }
     .pg-field-hint { font-size: 11px; color: var(--text-6); }
 
     .pg-divider-h {
@@ -957,115 +1260,12 @@
       color: var(--kbd-text);
     }
 
-    /* Playground inline-style helpers (for demo elements that use classes) */
-    .pg-btn-primary {
-      padding: 9px 18px;
-      background: var(--primary);
-      color: var(--primary-text);
-      border: none;
-      border-radius: 8px;
-      font-size: 13px;
-      font-weight: 600;
-      cursor: pointer;
-    }
-    .pg-btn-disabled {
-      padding: 9px 18px;
-      background: var(--disabled-bg);
-      color: var(--disabled-text);
-      border: none;
-      border-radius: 8px;
-      font-size: 13px;
-      font-weight: 600;
-      cursor: default;
-    }
-    .pg-btn-icon {
-      background: var(--primary);
-      color: var(--primary-text);
-      border: none;
-      border-radius: 8px;
-      width: 34px;
-      height: 34px;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-    .pg-btn-ghost {
-      background: none;
-      border: 1px solid var(--border-strong);
-      color: var(--text-5);
-      font-size: 12px;
-      padding: 5px 12px;
-      border-radius: 6px;
-      cursor: pointer;
-    }
-    .pg-btn-ghost-sm {
-      background: none;
-      border: 1px solid var(--border-strong);
-      color: var(--text-5);
-      font-size: 14px;
-      padding: 2px 6px;
-      border-radius: 4px;
-      cursor: pointer;
-      line-height: 1;
-    }
-    .pg-btn-full {
-      width: 100%;
-      padding: 9px 14px;
-      background: var(--primary);
-      color: var(--primary-text);
-      border: none;
-      border-radius: 8px;
-      font-size: 13px;
-      font-weight: 600;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      justify-content: center;
-    }
-    .pg-input-composite {
-      display: flex;
-      align-items: flex-end;
-      gap: 10px;
-      background: var(--card);
-      border: 1px solid var(--border-input);
-      border-radius: 14px;
-      padding: 10px 12px;
-      width: 100%;
-    }
-    .pg-input-composite textarea {
-      flex: 1;
-      background: none;
-      border: none;
-      outline: none;
-      color: var(--text);
-      font-size: 14.5px;
-      font-family: inherit;
-      line-height: 1.5;
-      resize: none;
-      min-height: 24px;
-    }
     .pg-section-border-demo {
       width: 200px;
       border-bottom: 1px solid var(--border);
       padding-bottom: 8px;
       font-size: 12px;
       color: var(--text-4);
-    }
-    .pg-code-block {
-      background: var(--code-bg);
-      border: 1px solid var(--asst-bubble-border);
-      border-radius: 8px;
-      padding: 14px 16px;
-      overflow-x: auto;
-      width: 100%;
-      margin: 0;
-    }
-    .pg-code-block code {
-      font-family: "SF Mono", "Fira Code", Consolas, monospace;
-      font-size: 13px;
-      color: var(--code-text);
     }
     .pg-empty-demo {
       display: flex;
@@ -1133,12 +1333,30 @@
     </button>
   </header>
 
+  <!-- Manage Models modal -->
+  <div id="manage-overlay" onclick="if(event.target===this)closeManageModal()">
+    <div id="manage-modal">
+      <div id="manage-header">
+        <h2>Manage Models</h2>
+        <button id="manage-close" onclick="closeManageModal()">&times;</button>
+      </div>
+      <div id="manage-body"></div>
+      <div id="manage-footer">
+        <div id="manage-suggestions"></div>
+        <div id="manage-search-wrap">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <input id="manage-add-input" type="text" placeholder="Search models or enter a name…" autocomplete="off" />
+        </div>
+      </div>
+    </div>
+  </div>
+
   <div id="app-body">
 
   <!-- Sidebar -->
   <div id="sidebar">
     <div id="sidebar-header">
-      <button id="new-chat-btn" onclick="newChat()">
+      <button id="new-chat-btn" class="btn-full" onclick="newChat()">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <line x1="12" y1="5" x2="12" y2="19"></line>
           <line x1="5" y1="12" x2="19" y2="12"></line>
@@ -1164,19 +1382,19 @@
           <div class="pg-atom">
             <div class="pg-atom-label">Primary</div>
             <div class="pg-atom-render">
-              <button class="pg-btn-primary">Send Message</button>
+              <button class="btn-primary">Send Message</button>
             </div>
           </div>
           <div class="pg-atom">
             <div class="pg-atom-label">Primary Disabled</div>
             <div class="pg-atom-render">
-              <button class="pg-btn-disabled" disabled>Send Message</button>
+              <button class="btn-primary" disabled>Send Message</button>
             </div>
           </div>
           <div class="pg-atom">
             <div class="pg-atom-label">Icon Button</div>
             <div class="pg-atom-render">
-              <button class="pg-btn-icon">
+              <button class="btn-icon">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;">
                   <line x1="22" y1="2" x2="11" y2="13"></line>
                   <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
@@ -1187,14 +1405,14 @@
           <div class="pg-atom">
             <div class="pg-atom-label">Ghost / Outline</div>
             <div class="pg-atom-render">
-              <button class="pg-btn-ghost">Clear</button>
-              <button class="pg-btn-ghost-sm">&times;</button>
+              <button class="btn-ghost">Clear</button>
+              <button class="btn-ghost-sm">&times;</button>
             </div>
           </div>
           <div class="pg-atom">
             <div class="pg-atom-label">Full-width Action</div>
             <div class="pg-atom-render" style="width:220px;">
-              <button class="pg-btn-full">
+              <button class="btn-full">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px;"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
                 New Chat
               </button>
@@ -1250,7 +1468,7 @@
             <div class="pg-atom-render" style="width:300px;">
               <div class="pg-input-composite">
                 <textarea placeholder="Message gemma4:e2b..." rows="1"></textarea>
-                <button class="pg-btn-icon" style="flex-shrink:0;">
+                <button class="btn-icon" style="flex-shrink:0;">
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
                 </button>
               </div>
@@ -1423,7 +1641,7 @@
             <div class="pg-atom-render">
               <div class="pg-tooltip-demo" style="margin-top:28px;">
                 <div class="pg-tip">Send (Enter)</div>
-                <button class="pg-btn-icon">
+                <button class="btn-icon">
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
                 </button>
               </div>
@@ -1549,9 +1767,9 @@ const response = await fetch('/api/chat', {
     </div>
 
     <div id="input-area">
-      <div id="input-wrap">
+      <div id="input-wrap" class="chat-input-wrap">
         <textarea id="prompt" placeholder="Message gemma4:e2b&hellip;" rows="1"></textarea>
-        <button id="send-btn" onclick="sendMessage()" title="Send (Enter)">
+        <button id="send-btn" class="btn-icon" onclick="sendMessage()" title="Send (Enter)">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
             <line x1="22" y1="2" x2="11" y2="13"></line>
             <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
@@ -1578,8 +1796,9 @@ const response = await fetch('/api/chat', {
     let currentModel = localStorage.getItem('model') || MODELS[0];
     let localModels = new Set();
     let pullingModels = new Set();
-    let pullProgress = {}; // model -> { pct: 0-100, label: string }
-    let pausedModels = {}; // model -> { pct, label } at time of pause
+    let pullProgress  = {}; // model -> { pct, label, total, rawCompleted, rawTotal, speed, eta }
+    let pausedModels  = {}; // model -> snapshot at time of pause
+    const speedIntervals = {}; // model -> intervalId
 
     // ── DOM refs ─────────────────────────────────────────────
     const messagesEl = document.getElementById('messages');
@@ -1628,16 +1847,24 @@ const response = await fetch('/api/chat', {
     const modelMenu = document.getElementById('model-menu');
     const modelBtnLabel = document.getElementById('model-btn-label');
 
+    let localModelInfo = {}; // model name -> { name, size, ... }
+
     async function fetchLocalModels() {
       try {
         const port = await window.electronAPI.getProxyPort();
         const res = await fetch(`http://127.0.0.1:${port}/api/tags`);
         const data = await res.json();
         localModels = new Set((data.models || []).map(m => m.name));
+        localModelInfo = {};
+        for (const m of (data.models || [])) {
+          localModelInfo[m.name] = m;
+        }
       } catch {
         localModels = new Set();
+        localModelInfo = {};
       }
       renderModelMenu();
+      renderManageModels();
     }
 
     function makeActionBtn(svgPath, title, onClick) {
@@ -1675,6 +1902,9 @@ const response = await fetch('/api/chat', {
           const prog = (pulling ? pullProgress[m] : pausedModels[m]) || { pct: 0, label: '…' };
           const indeterminate = pulling && prog.pct === 0;
           const pctDisplay = prog.pct > 0 ? `${prog.pct}%` : prog.label;
+          const statsDisplay = paused
+            ? (prog.total || '')
+            : [prog.speed, prog.total, prog.eta].filter(Boolean).join(' · ');
 
           // Left icon: ↓ when downloading, ⏸ when paused
           const icon = document.createElement('span');
@@ -1693,7 +1923,8 @@ const response = await fetch('/api/chat', {
               <div class="model-pull-bar-fill${indeterminate ? ' indeterminate' : ''}"
                    id="pull-bar-${safeId}"
                    style="width:${indeterminate ? '30' : prog.pct}%"></div>
-            </div>`;
+            </div>
+            <div class="model-pull-stats" id="pull-stats-${safeId}">${statsDisplay}</div>`;
 
           // Right action button: pause or resume
           const actionBtn = paused
@@ -1729,6 +1960,258 @@ const response = await fetch('/api/chat', {
 
         modelMenu.appendChild(opt);
       }
+
+      // Divider + Manage button
+      const divider = document.createElement('hr');
+      divider.className = 'model-menu-divider';
+      modelMenu.appendChild(divider);
+
+      const manageBtn = document.createElement('div');
+      manageBtn.className = 'model-option';
+      manageBtn.style.color = 'var(--text-3)';
+      manageBtn.style.fontSize = '12px';
+      manageBtn.onclick = () => { modelMenu.classList.remove('open'); openManageModal(); };
+      manageBtn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px;flex-shrink:0;"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg><span>Manage models…</span>`;
+      modelMenu.appendChild(manageBtn);
+    }
+
+    // ── Manage Models modal ──────────────────────────────────
+    const manageOverlay = document.getElementById('manage-overlay');
+    const manageBody = document.getElementById('manage-body');
+    const manageAddInput = document.getElementById('manage-add-input');
+
+    function openManageModal() {
+      fetchLocalModels();
+      manageOverlay.classList.add('open');
+    }
+    function closeManageModal() {
+      manageOverlay.classList.remove('open');
+    }
+
+    function renderManageModels() {
+      if (!manageOverlay.classList.contains('open')) return;
+      manageBody.innerHTML = '';
+
+      // Gather all known models: MODELS list + any installed not in MODELS
+      const allModels = [...MODELS];
+      for (const name of localModels) {
+        if (!allModels.includes(name)) allModels.push(name);
+      }
+      for (const name of pullingModels) {
+        if (!allModels.includes(name)) allModels.push(name);
+      }
+      for (const name in pausedModels) {
+        if (!allModels.includes(name)) allModels.push(name);
+      }
+
+      for (const m of allModels) {
+        const installed = localModels.has(m);
+        const pulling   = pullingModels.has(m);
+        const paused    = !!pausedModels[m];
+        const info      = localModelInfo[m];
+        const safeId    = 'mm-' + m.replace(/[^a-z0-9]/gi, '_');
+
+        const row = document.createElement('div');
+        row.className = 'mm-row';
+
+        // Icon
+        const icon = document.createElement('div');
+        if (pulling || paused) {
+          icon.className = 'mm-icon pulling';
+          icon.textContent = paused ? '⏸' : '↓';
+        } else if (installed) {
+          icon.className = 'mm-icon installed';
+          icon.textContent = '✓';
+        } else {
+          icon.className = 'mm-icon available';
+          icon.textContent = '+';
+        }
+
+        // Info / progress area
+        if (pulling || paused) {
+          const prog = (pulling ? pullProgress[m] : pausedModels[m]) || { pct: 0, label: '…' };
+          const pctDisplay = prog.pct > 0 ? `${prog.pct}%` : prog.label;
+          const statsDisplay = paused
+            ? (prog.total || '')
+            : [prog.speed, prog.total, prog.eta].filter(Boolean).join(' · ');
+
+          const wrap = document.createElement('div');
+          wrap.className = 'mm-progress';
+          wrap.innerHTML = `
+            <div class="mm-progress-top">
+              <span class="mm-name">${m}</span>
+              <span class="mm-meta" id="${safeId}-pct">${paused ? (prog.pct > 0 ? 'Paused · ' + prog.pct + '%' : 'Paused') : pctDisplay}</span>
+            </div>
+            <div class="model-pull-bar-track">
+              <div class="model-pull-bar-fill" id="${safeId}-bar" style="width:${prog.pct}%"></div>
+            </div>
+            <div class="mm-progress-stats" id="${safeId}-stats">${statsDisplay}</div>`;
+
+          row.appendChild(icon);
+          row.appendChild(wrap);
+
+          // Action buttons
+          const actionWrap = document.createElement('div');
+          actionWrap.className = 'mm-actions';
+          if (paused) {
+            actionWrap.innerHTML = `<button class="mm-btn-resume" onclick="resumePull('${m}')">Resume</button>`;
+          } else {
+            actionWrap.innerHTML = `<button class="mm-btn-pause" onclick="pausePull('${m}')">Pause</button>`;
+          }
+          actionWrap.innerHTML += `<button class="mm-btn-delete" title="Cancel" onclick="cancelPull('${m}')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg></button>`;
+          row.appendChild(actionWrap);
+        } else {
+          const infoDiv = document.createElement('div');
+          infoDiv.className = 'mm-info';
+          const sizeStr = info ? formatBytes(info.size) : '';
+          infoDiv.innerHTML = `
+            <span class="mm-name">${m}</span>
+            <span class="mm-meta">${installed ? sizeStr : (sizeStr || 'Not installed')}</span>`;
+          row.appendChild(icon);
+          row.appendChild(infoDiv);
+
+          const actionWrap = document.createElement('div');
+          actionWrap.className = 'mm-actions';
+          if (!installed) {
+            actionWrap.innerHTML = `<button class="mm-btn-install" onclick="pullModel('${m}')">Install</button>`;
+            actionWrap.innerHTML += `<button class="mm-btn-delete" title="Remove" onclick="removeModel('${m}')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg></button>`;
+          } else {
+            if (m === currentModel) {
+              actionWrap.innerHTML += `<span class="mm-meta" style="padding:4px 0;">Active</span>`;
+            } else {
+              actionWrap.innerHTML += `<button onclick="selectModel('${m}');renderManageModels()">Select</button>`;
+            }
+            actionWrap.innerHTML += `<button class="mm-btn-delete" title="Delete" onclick="deleteModel('${m}')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg></button>`;
+          }
+          row.appendChild(actionWrap);
+        }
+
+        manageBody.appendChild(row);
+      }
+    }
+
+    // ── Model catalog (curated popular models) ─────────────
+    const MODEL_CATALOG = [
+      { name: 'llama3.2',     desc: 'Meta Llama 3.2',                   sizes: '1B, 3B' },
+      { name: 'llama3.1',     desc: 'Meta Llama 3.1',                   sizes: '8B, 70B, 405B' },
+      { name: 'llama3.3',     desc: 'Meta Llama 3.3',                   sizes: '70B' },
+      { name: 'gemma4',       desc: 'Google Gemma 4',                    sizes: '12B, 27B' },
+      { name: 'gemma3',       desc: 'Google Gemma 3',                    sizes: '1B, 4B, 12B, 27B' },
+      { name: 'qwen3',        desc: 'Alibaba Qwen 3',                   sizes: '0.6B–235B' },
+      { name: 'qwen2.5',      desc: 'Alibaba Qwen 2.5',                 sizes: '0.5B–72B' },
+      { name: 'phi4',         desc: 'Microsoft Phi 4',                   sizes: '14B' },
+      { name: 'phi3',         desc: 'Microsoft Phi 3',                   sizes: '3.8B, 14B' },
+      { name: 'mistral',      desc: 'Mistral 7B',                        sizes: '7B' },
+      { name: 'mixtral',      desc: 'Mistral Mixtral MoE',              sizes: '8x7B, 8x22B' },
+      { name: 'deepseek-r1',  desc: 'DeepSeek R1 reasoning',            sizes: '1.5B–671B' },
+      { name: 'deepseek-v2',  desc: 'DeepSeek V2 chat',                 sizes: '16B, 236B' },
+      { name: 'codellama',    desc: 'Meta Code Llama',                   sizes: '7B, 13B, 34B, 70B' },
+      { name: 'codegemma',    desc: 'Google CodeGemma',                  sizes: '2B, 7B' },
+      { name: 'starcoder2',   desc: 'BigCode StarCoder 2',              sizes: '3B, 7B, 15B' },
+      { name: 'nomic-embed-text', desc: 'Nomic text embeddings',        sizes: '137M' },
+      { name: 'mxbai-embed-large', desc: 'Mixedbread embed large',     sizes: '335M' },
+      { name: 'llava',        desc: 'LLaVA multimodal vision',           sizes: '7B, 13B, 34B' },
+      { name: 'command-r',    desc: 'Cohere Command R',                  sizes: '35B, 104B' },
+      { name: 'vicuna',       desc: 'LMSYS Vicuna',                      sizes: '7B, 13B, 33B' },
+      { name: 'orca-mini',    desc: 'Orca Mini',                         sizes: '3B, 7B, 13B, 70B' },
+      { name: 'tinyllama',    desc: 'TinyLlama compact',                 sizes: '1.1B' },
+      { name: 'dolphin-phi',  desc: 'Dolphin Phi fine-tune',            sizes: '2.7B' },
+      { name: 'stable-code',  desc: 'Stability AI code',                sizes: '3B' },
+    ];
+
+    const suggestionsEl = document.getElementById('manage-suggestions');
+
+    function installModel(name) {
+      if (!MODELS.includes(name)) MODELS.push(name);
+      manageAddInput.value = '';
+      suggestionsEl.classList.remove('open');
+      pullModel(name);
+      renderManageModels();
+    }
+
+    function renderSuggestions() {
+      const query = manageAddInput.value.trim().toLowerCase();
+      suggestionsEl.innerHTML = '';
+
+      if (!query) {
+        suggestionsEl.classList.remove('open');
+        return;
+      }
+
+      const matches = MODEL_CATALOG.filter(m =>
+        m.name.includes(query) || m.desc.toLowerCase().includes(query)
+      ).slice(0, 8);
+
+      if (matches.length === 0 && !query) {
+        suggestionsEl.classList.remove('open');
+        return;
+      }
+
+      for (const m of matches) {
+        const installed = localModels.has(m.name);
+        const alreadyInList = MODELS.includes(m.name);
+        const item = document.createElement('div');
+        item.className = 'ms-item';
+        if (!installed) {
+          item.onclick = () => installModel(m.name);
+        }
+
+        item.innerHTML = `
+          <div class="ms-info">
+            <div class="ms-name">${m.name}</div>
+            <div class="ms-desc">${m.desc}</div>
+          </div>
+          <div class="ms-sizes">${m.sizes}</div>
+          ${installed ? '<span class="ms-installed">Installed</span>' : ''}`;
+        suggestionsEl.appendChild(item);
+      }
+
+      // Always show "install custom" option if query doesn't exactly match a catalog entry
+      const exactMatch = matches.some(m => m.name === query);
+      if (!exactMatch && query) {
+        const custom = document.createElement('div');
+        custom.className = 'ms-custom';
+        custom.onclick = () => installModel(query);
+        custom.innerHTML = `Install <strong>${query}</strong> from Ollama registry`;
+        suggestionsEl.appendChild(custom);
+      }
+
+      suggestionsEl.classList.add('open');
+    }
+
+    manageAddInput.addEventListener('input', renderSuggestions);
+    manageAddInput.addEventListener('focus', renderSuggestions);
+    manageAddInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        const name = manageAddInput.value.trim();
+        if (name) installModel(name);
+      }
+      if (e.key === 'Escape') {
+        suggestionsEl.classList.remove('open');
+        manageAddInput.blur();
+      }
+    });
+    // Close suggestions on click outside
+    document.addEventListener('click', (e) => {
+      if (!document.getElementById('manage-footer').contains(e.target)) {
+        suggestionsEl.classList.remove('open');
+      }
+    });
+
+    async function deleteModel(model) {
+      try {
+        await window.electronAPI.deleteModel(model);
+      } catch (err) {
+        console.error('Delete failed:', err);
+      }
+      // If deleted model was active, switch to first available
+      if (model === currentModel) {
+        await fetchLocalModels();
+        const fallback = MODELS.find(m => localModels.has(m)) || MODELS[0];
+        selectModel(fallback);
+      } else {
+        fetchLocalModels();
+      }
     }
 
     async function pullModel(model) {
@@ -1736,12 +2219,15 @@ const response = await fetch('/api/chat', {
       pullingModels.add(model);
       pullProgress[model] = pullProgress[model] || { pct: 0, label: 'Preparing…' };
       renderModelMenu();
+      renderManageModels();
+      startSpeedInterval(model);
       try {
         await window.electronAPI.pullModel(model);
       } catch (err) {
         console.error('Pull failed:', err);
       } finally {
         if (pullingModels.has(model)) {
+          stopSpeedInterval(model);
           pullingModels.delete(model);
           delete pullProgress[model];
           fetchLocalModels();
@@ -1758,19 +2244,109 @@ const response = await fetch('/api/chat', {
       pullModel(model);
     }
 
+    async function cancelPull(model) {
+      // Stop the download if active
+      if (pullingModels.has(model)) {
+        await window.electronAPI.pausePull(model);
+      }
+      // Clean up all state
+      stopSpeedInterval(model);
+      pullingModels.delete(model);
+      delete pullProgress[model];
+      delete pausedModels[model];
+      // Remove from MODELS list if not installed
+      if (!localModels.has(model)) {
+        const idx = MODELS.indexOf(model);
+        if (idx >= 0) MODELS.splice(idx, 1);
+      }
+      renderModelMenu();
+      renderManageModels();
+    }
+
+    function removeModel(model) {
+      const idx = MODELS.indexOf(model);
+      if (idx >= 0) MODELS.splice(idx, 1);
+      renderModelMenu();
+      renderManageModels();
+    }
+
+    // ── Pull progress helpers ────────────────────────────────
+    function formatSpeed(bps) {
+      if (bps >= 1024 * 1024) return `${(bps / (1024 * 1024)).toFixed(1)} MB/s`;
+      if (bps >= 1024)        return `${Math.round(bps / 1024)} KB/s`;
+      return `${Math.round(bps)} B/s`;
+    }
+    function formatBytes(b) {
+      if (b >= 1024 * 1024 * 1024) return `${(b / (1024 * 1024 * 1024)).toFixed(2)} GB`;
+      if (b >= 1024 * 1024)        return `${(b / (1024 * 1024)).toFixed(1)} MB`;
+      if (b >= 1024)               return `${Math.round(b / 1024)} KB`;
+      return `${b} B`;
+    }
+    function formatETA(secs) {
+      if (!isFinite(secs) || secs <= 0) return '';
+      if (secs < 60)   return `~${Math.round(secs)}s`;
+      if (secs < 3600) return `~${Math.round(secs / 60)}m`;
+      return `~${(secs / 3600).toFixed(1)}h`;
+    }
+
+    function stopSpeedInterval(model) {
+      clearInterval(speedIntervals[model]);
+      delete speedIntervals[model];
+    }
+
+    function startSpeedInterval(model) {
+      stopSpeedInterval(model);
+      let prevCompleted = pullProgress[model]?.rawCompleted || 0;
+
+      speedIntervals[model] = setInterval(() => {
+        if (!pullingModels.has(model)) { stopSpeedInterval(model); return; }
+
+        const prog = pullProgress[model];
+        if (!prog) return;
+
+        const curCompleted = prog.rawCompleted || 0;
+        const bytesDelta   = curCompleted - prevCompleted;
+        prevCompleted      = curCompleted;
+
+        // bytesDelta per 1 s = bytes/s
+        const speedRaw = bytesDelta > 0 ? bytesDelta : 0;
+        const speed    = speedRaw > 0 ? formatSpeed(speedRaw) : '';
+        const eta      = speedRaw > 0 && prog.rawTotal
+          ? formatETA((prog.rawTotal - curCompleted) / speedRaw)
+          : (prog.eta || '');
+
+        pullProgress[model] = { ...prog, speed, eta };
+
+        const safeId  = model.replace(/[^a-z0-9]/gi, '_');
+        const statsText = [speed, prog.total, eta].filter(Boolean).join(' · ');
+
+        // Update dropdown stats
+        const statsEl = document.getElementById(`pull-stats-${safeId}`);
+        if (statsEl) statsEl.textContent = statsText;
+
+        // Update modal stats
+        const mmSafeId  = 'mm-' + safeId;
+        const mmStatsEl = document.getElementById(`${mmSafeId}-stats`);
+        if (mmStatsEl) mmStatsEl.textContent = statsText;
+      }, 1000);
+    }
+
     // ── Pull progress events ─────────────────────────────────
     window.electronAPI.onPullProgress((data) => {
       const { model, status, total, completed, done, paused } = data;
 
       if (paused) {
+        stopSpeedInterval(model);
         pullingModels.delete(model);
         pausedModels[model] = pullProgress[model] || { pct: 0, label: 'Paused' };
         delete pullProgress[model];
         renderModelMenu();
+        renderManageModels();
         return;
       }
 
       if (done) {
+        stopSpeedInterval(model);
         pullingModels.delete(model);
         delete pullProgress[model];
         delete pausedModels[model];
@@ -1778,33 +2354,41 @@ const response = await fetch('/api/chat', {
         return;
       }
 
-      let pct = pullProgress[model]?.pct || 0;
+      const prev = pullProgress[model] || {};
+      let pct = prev.pct || 0;
       let label = '…';
 
-      if (total && completed) {
+      if (total !== undefined && completed !== undefined) {
         pct = Math.round((completed / total) * 100);
-        label = `${pct}%`;
-      } else if (status === 'pulling manifest') {
-        label = 'Preparing…';
-      } else if (status && status.startsWith('verifying')) {
-        pct = 95; label = 'Verifying…';
-      } else if (status && status.startsWith('writing')) {
-        pct = 98; label = 'Finalizing…';
-      } else if (status) {
-        label = status;
+        pullProgress[model] = {
+          ...prev,
+          pct,
+          label: `${pct}%`,
+          total: formatBytes(total),
+          rawCompleted: completed,
+          rawTotal: total,
+        };
+      } else {
+        if (status === 'pulling manifest')        label = 'Preparing…';
+        else if (status?.startsWith('verifying')) { pct = 95; label = 'Verifying…'; }
+        else if (status?.startsWith('writing'))   { pct = 98; label = 'Finalizing…'; }
+        else if (status)                           label = status;
+        pullProgress[model] = { ...prev, pct, label, speed: '', eta: '' };
       }
 
-      pullProgress[model] = { pct, label };
-
-      // Update bar and label in-place
+      // Update bar + percentage in-place (stats updated by interval)
       const safeId = model.replace(/[^a-z0-9]/gi, '_');
-      const barEl = document.getElementById(`pull-bar-${safeId}`);
-      const pctEl = document.getElementById(`pull-pct-${safeId}`);
-      if (barEl) {
-        barEl.classList.remove('indeterminate');
-        barEl.style.width = `${pct}%`;
-      }
-      if (pctEl) pctEl.textContent = pct > 0 ? `${pct}%` : label;
+      const barEl  = document.getElementById(`pull-bar-${safeId}`);
+      const pctEl  = document.getElementById(`pull-pct-${safeId}`);
+      if (barEl) { barEl.classList.remove('indeterminate'); barEl.style.width = `${pct}%`; }
+      if (pctEl)   pctEl.textContent = pct > 0 ? `${pct}%` : label;
+
+      // Also update modal elements
+      const mmSafeId = 'mm-' + safeId;
+      const mmBarEl  = document.getElementById(`${mmSafeId}-bar`);
+      const mmPctEl  = document.getElementById(`${mmSafeId}-pct`);
+      if (mmBarEl) mmBarEl.style.width = `${pct}%`;
+      if (mmPctEl) mmPctEl.textContent = pct > 0 ? `${pct}%` : label;
     });
 
     function toggleModelMenu() {

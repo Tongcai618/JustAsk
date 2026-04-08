@@ -289,6 +289,29 @@ ipcMain.handle('pull-model', (_event, model) => {
   });
 });
 
+ipcMain.handle('delete-model', (_event, model) => {
+  return new Promise((resolve, reject) => {
+    const payload = JSON.stringify({ name: model });
+    const req = http.request(
+      `${OLLAMA_URL}/api/delete`,
+      {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+          'Content-Length': Buffer.byteLength(payload),
+        },
+      },
+      (res) => {
+        res.resume();
+        res.on('end', () => resolve(res.statusCode === 200));
+      }
+    );
+    req.on('error', reject);
+    req.write(payload);
+    req.end();
+  });
+});
+
 ipcMain.handle('pause-pull', (_event, model) => {
   const proc = activeProcs[model];
   if (proc) proc.pause();
