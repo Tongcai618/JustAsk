@@ -1,5 +1,6 @@
 {
   "name": "justask",
+  "productName": "JustAsk",
   "version": "2.0.0",
   "description": "JustAsk — Desktop chat UI powered by Ollama",
   "main": "main.js",

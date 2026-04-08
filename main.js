@@ -3,6 +3,8 @@ const http = require('http');
 const fs = require('fs');
 const path = require('path');
 
+app.setName('JustAsk');
+
 const MODEL = 'gemma4:e2b';
 const OLLAMA_URL = 'http://localhost:11434';
 const PROXY_PORT = 3131;
@@ -161,9 +163,10 @@ function createWindow() {
     width: 1100,
     height: 700,
     title: 'JustAsk',
+    icon: path.join(__dirname, 'assets', 'icon.icns'),
     titleBarStyle: 'hiddenInset',
     trafficLightPosition: { x: 16, y: 16 },
-    backgroundColor: '#7b9669',
+    backgroundColor: '#f0f3ed',
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
       contextIsolation: true,
@@ -320,6 +323,9 @@ ipcMain.handle('pause-pull', (_event, model) => {
 
 // ── App lifecycle ────────────────────────────────────────────────────
 app.whenReady().then(() => {
+  if (process.platform === 'darwin') {
+    app.dock.setIcon(path.join(__dirname, 'assets', 'icon-1024.png'));
+  }
   startProxy();
   createWindow();
 

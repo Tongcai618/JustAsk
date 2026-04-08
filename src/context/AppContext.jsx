@@ -28,7 +28,7 @@ export function AppProvider({ children }) {
   /* ── core state -------------------------------------------------- */
   const [apiBase, setApiBase] = useState('http://127.0.0.1:3131');
   const [theme, setThemeState] = useState(
-    () => localStorage.getItem('theme') || 'dark',
+    () => localStorage.getItem('theme') || 'light',
   );
   const [currentModel, setCurrentModel] = useState(
     () => localStorage.getItem('model') || 'gemma4:e2b',
