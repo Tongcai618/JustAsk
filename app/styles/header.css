@@ -1,0 +1,175 @@
+/* ── Header ──────────────────────────────────────────────── */
+header {
+  padding: 14px 24px 14px 84px;
+  background: var(--primary);
+  border-bottom: 1px solid var(--primary-hover);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+  -webkit-app-region: drag;
+  transition: background 0.25s, border-color 0.25s;
+}
+
+header h1 {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--primary-text);
+}
+
+.header-spacer { flex: 1; }
+
+.header-btn {
+  -webkit-app-region: no-drag;
+  background: rgba(255,255,255,0.12);
+  border: none;
+  color: var(--primary-text);
+  font-size: 11px;
+  font-weight: 500;
+  padding: 5px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  transition: background 0.15s;
+}
+.header-btn:hover { background: rgba(255,255,255,0.22); }
+.header-btn.active { background: rgba(255,255,255,0.28); }
+.header-btn svg { width: 12px; height: 12px; }
+
+/* ── Model dropdown ──────────────────────────────────────── */
+#model-dropdown-wrap {
+  position: relative;
+  -webkit-app-region: no-drag;
+}
+
+#model-btn {
+  background: rgba(255,255,255,0.15);
+  color: var(--primary-text);
+  font-size: 12px;
+  font-weight: 600;
+  padding: 3px 10px;
+  border-radius: 20px;
+  letter-spacing: 0.4px;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  transition: background 0.15s;
+}
+#model-btn:hover { background: rgba(255,255,255,0.25); }
+#model-btn svg { width: 10px; height: 10px; opacity: 0.8; }
+
+#model-menu {
+  display: none;
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  background: var(--surface);
+  border: 1px solid var(--border-strong);
+  border-radius: 10px;
+  padding: 6px;
+  min-width: 220px;
+  z-index: 100;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.25);
+}
+#model-menu.open { display: block; }
+
+.model-option {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 13px;
+  color: var(--text-2);
+  transition: background 0.1s;
+}
+.model-option:hover { background: var(--conv-hover); }
+.model-option.selected { color: var(--primary); font-weight: 600; }
+.model-option .check {
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+  color: var(--primary);
+  visibility: hidden;
+}
+.model-option.selected .check { visibility: visible; }
+.model-option.not-installed { color: var(--text-4); }
+.model-option.not-installed:hover { background: var(--conv-hover); }
+.model-option.not-installed .model-plus {
+  font-size: 13px;
+  color: var(--text-4);
+  flex-shrink: 0;
+  width: 14px;
+  text-align: center;
+}
+.model-option.pulling,
+.model-option.paused { cursor: default; padding: 10px 10px; align-items: center; }
+.model-pull-progress {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  min-width: 0;
+}
+.model-pull-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 6px;
+}
+.model-pull-name { font-size: 12px; color: var(--text-4); }
+.model-pull-pct  { font-size: 11px; color: var(--text-5); flex-shrink: 0; }
+.model-pull-stats {
+  font-size: 10px;
+  color: var(--text-6);
+  letter-spacing: 0.01em;
+  min-height: 13px;
+}
+.model-pull-bar-track {
+  height: 3px;
+  background: var(--border);
+  border-radius: 2px;
+  overflow: hidden;
+}
+.model-pull-bar-fill {
+  height: 100%;
+  background: var(--primary);
+  border-radius: 2px;
+  transition: width 0.25s ease;
+  width: 0%;
+}
+@keyframes pull-shimmer {
+  0%   { transform: translateX(-150%); }
+  100% { transform: translateX(400%); }
+}
+.model-pull-bar-fill.indeterminate {
+  width: 30% !important;
+  animation: pull-shimmer 1.2s ease-in-out infinite;
+}
+.model-option.paused { color: var(--text-4); }
+.model-pull-action {
+  flex-shrink: 0;
+  width: 20px; height: 20px;
+  border: none;
+  background: none;
+  color: var(--text-3);
+  cursor: pointer;
+  border-radius: 4px;
+  display: flex; align-items: center; justify-content: center;
+  padding: 0;
+  transition: color 0.15s, background 0.15s;
+  -webkit-app-region: no-drag;
+}
+.model-pull-action:hover { color: var(--text); background: var(--border); }
+.model-pull-action svg { width: 11px; height: 11px; }
+
+.model-menu-divider {
+  border: none;
+  border-top: 1px solid var(--border);
+  margin: 4px 0;
+}
