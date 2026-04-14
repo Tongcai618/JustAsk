@@ -154,6 +154,8 @@
 }
 
 #prompt::placeholder { color: var(--text-5); }
+#prompt:disabled { opacity: 1; cursor: default; color: var(--text); }
+#prompt:disabled::placeholder { color: var(--text-5); }
 
 .empty-state {
   flex: 1;

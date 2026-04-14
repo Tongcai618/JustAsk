@@ -10,7 +10,7 @@ export default function ChatArea() {
   const { history, isStreaming, currentModel, sendMessage, pendingNewChat, mode, requestWordSession } =
     useApp();
 
-  const isWordMix = mode === 'wordmix';
+  const isWordMix = mode === 'vocab';
 
   /* ── refs -------------------------------------------------------- */
   const messagesRef = useRef(null);
@@ -230,7 +230,7 @@ export default function ChatArea() {
         <div ref={messagesEndRef} />
       </div>
 
-      {/* ── WordMix buttons (above input when in wordmix mode) ---- */}
+      {/* ── WordMix buttons (above input when in vocab mode) ---- */}
       {isWordMix && <WordMixButtons />}
 
       {/* ── Input area -------------------------------------------- */}

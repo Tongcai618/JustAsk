@@ -7,6 +7,7 @@ header {
   align-items: center;
   gap: 10px;
   flex-shrink: 0;
+  position: relative;
   -webkit-app-region: drag;
   transition: background 0.25s, border-color 0.25s;
 }
@@ -18,6 +19,99 @@ header h1 {
 }
 
 .header-spacer { flex: 1; }
+
+/* ── Tab bar (centered in header) ───────────────────────── */
+.tab-bar {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  background: rgba(0,0,0,0.15);
+  border-radius: 8px;
+  padding: 3px;
+  -webkit-app-region: no-drag;
+}
+.tab-btn {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 14px;
+  border-radius: 6px;
+  border: none;
+  background: none;
+  color: rgba(255,255,255,0.65);
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+.tab-btn:hover { color: rgba(255,255,255,0.9); }
+.tab-btn.active {
+  background: rgba(255,255,255,0.2);
+  color: var(--primary-text);
+  font-weight: 600;
+}
+.charley-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--text-5);
+  flex-shrink: 0;
+}
+.charley-dot.online { background: #4ade80; }
+
+/* ── Charley placeholder ────────────────────────────────── */
+.charley-placeholder {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  color: var(--text-4);
+}
+.charley-avatar {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: var(--primary-bg-subtle);
+  color: var(--primary);
+  font-size: 28px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.charley-name {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text);
+}
+.charley-status {
+  font-size: 12px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+.charley-status::before {
+  content: '';
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--text-5);
+}
+.charley-status.online::before { background: #4ade80; }
+.charley-coming-soon {
+  font-size: 13px;
+  color: var(--text-4);
+  max-width: 300px;
+  text-align: center;
+  line-height: 1.6;
+}
 
 .header-btn {
   -webkit-app-region: no-drag;

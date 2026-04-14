@@ -3,6 +3,7 @@ import { AppProvider, useApp } from './context/AppContext';
 import Header from './components/Header';
 import Sidebar from './components/Sidebar';
 import ChatArea from './components/ChatArea';
+import CharleyArea from './components/CharleyArea';
 import ManageModelsModal from './components/ManageModelsModal';
 import Playground from './components/Playground';
 import { loadWordBank } from './lib/wordbank';
@@ -17,15 +18,15 @@ import './styles/playground.css';
 import './styles/wordmix.css';
 
 function AppInner() {
-  const { theme } = useApp();
+  const { theme, mode } = useApp();
   const [playgroundActive, setPlaygroundActive] = useState(false);
   const [manageOpen, setManageOpen] = useState(false);
 
+  const isChat = mode === 'chat';
+
   // Load word bank on startup
   useEffect(() => {
-    loadWordBank().catch(() => {
-      /* word bank not available yet */
-    });
+    loadWordBank().catch(() => {});
   }, []);
 
   return (
@@ -42,10 +43,11 @@ function AppInner() {
       />
 
       <div id="app-body">
-        <Sidebar />
+        {isChat && <Sidebar />}
         <Playground visible={playgroundActive} />
+
         <div id="main" style={{ display: playgroundActive ? 'none' : 'flex' }}>
-          <ChatArea />
+          {mode === 'charley' ? <CharleyArea /> : <ChatArea />}
         </div>
       </div>
     </>

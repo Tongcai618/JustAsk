@@ -50,7 +50,7 @@ export function AppProvider({ children }) {
   const [pendingNewChat, setPendingNewChat] = useState(false);
 
   /* ── app mode ---------------------------------------------------- */
-  const [mode, setModeState] = useState('chat'); // 'chat' | 'wordmix'
+  const [mode, setModeState] = useState('chat'); // 'chat' | 'vocab'
 
   /* ── word session request (from chat panel → WordMixButtons) ----- */
   const [pendingWordSession, setPendingWordSession] = useState(null);
@@ -61,33 +61,33 @@ export function AppProvider({ children }) {
     setPendingWordSession(null);
   }, []);
 
-  // Stash chat state when switching to wordmix, restore when switching back
+  // Stash chat state when switching to vocab, restore when switching back
   const chatStashRef = useRef({ history: [], currentConvId: null, pendingNewChat: false });
-  const wordmixHistoryRef = useRef([]);
-  const wordmixLoadedRef = useRef(false);
+  const vocabHistoryRef = useRef([]);
+  const vocabLoadedRef = useRef(false);
 
   // Load the single persistent WordMix history from disk
   const loadWordMixHistory = useCallback(async () => {
-    if (wordmixLoadedRef.current) return wordmixHistoryRef.current;
+    if (vocabLoadedRef.current) return vocabHistoryRef.current;
     try {
       if (window.electronAPI?.loadProgress) {
         const data = await window.electronAPI.loadProgress();
-        if (data?.wordmixHistory) {
-          wordmixHistoryRef.current = data.wordmixHistory;
+        if (data?.vocabHistory) {
+          vocabHistoryRef.current = data.vocabHistory;
         }
       }
     } catch { /* ignore */ }
-    wordmixLoadedRef.current = true;
-    return wordmixHistoryRef.current;
+    vocabLoadedRef.current = true;
+    return vocabHistoryRef.current;
   }, []);
 
   // Save the single persistent WordMix history to disk
   const saveWordMixHistory = useCallback(async (wmHistory) => {
-    wordmixHistoryRef.current = wmHistory;
+    vocabHistoryRef.current = wmHistory;
     try {
       if (window.electronAPI?.loadProgress) {
         const data = (await window.electronAPI.loadProgress()) || {};
-        data.wordmixHistory = wmHistory;
+        data.vocabHistory = wmHistory;
         await window.electronAPI.saveProgress(data);
       }
     } catch { /* ignore */ }
@@ -96,21 +96,36 @@ export function AppProvider({ children }) {
   const setMode = useCallback(async (nextMode) => {
     if (mode === nextMode) return;
 
-    if (mode === 'chat' && nextMode === 'wordmix') {
-      // Stash current chat state
+    // Leaving chat — stash chat state
+    if (mode === 'chat') {
       chatStashRef.current = { history, currentConvId, pendingNewChat };
-      // Load persistent wordmix history
+    }
+
+    // Leaving vocab — save vocab history
+    if (mode === 'vocab') {
+      await saveWordMixHistory(history);
+    }
+
+    // Entering vocab — load vocab history
+    if (nextMode === 'vocab') {
       const wmHistory = await loadWordMixHistory();
       setHistory(wmHistory);
       setCurrentConvId(null);
       setPendingNewChat(false);
-    } else if (mode === 'wordmix' && nextMode === 'chat') {
-      // Save wordmix history to disk
-      await saveWordMixHistory(history);
-      // Restore chat state
+    }
+
+    // Entering chat — restore chat state
+    if (nextMode === 'chat') {
       setHistory(chatStashRef.current.history);
       setCurrentConvId(chatStashRef.current.currentConvId);
       setPendingNewChat(chatStashRef.current.pendingNewChat);
+    }
+
+    // Entering charley — clear history (fresh conversation)
+    if (nextMode === 'charley') {
+      setHistory([]);
+      setCurrentConvId(null);
+      setPendingNewChat(false);
     }
 
     setModeState(nextMode);
@@ -336,8 +351,8 @@ export function AppProvider({ children }) {
   /*  Conversation management                                         */
   /* ================================================================ */
   const newChat = useCallback(async () => {
-    // If in wordmix mode, save and switch to chat
-    if (mode === 'wordmix') {
+    // If in vocab mode, save and switch to chat
+    if (mode === 'vocab') {
       await saveWordMixHistory(history);
       setModeState('chat');
     }
@@ -352,7 +367,7 @@ export function AppProvider({ children }) {
       if (!conv) return;
 
       // Loading a sidebar conversation always goes to chat mode
-      if (mode === 'wordmix') {
+      if (mode === 'vocab') {
         await saveWordMixHistory(history);
         setModeState('chat');
       }
@@ -384,7 +399,7 @@ export function AppProvider({ children }) {
     if (history.length === 0) return;
 
     // WordMix saves separately — not to the sidebar conversation list
-    if (mode === 'wordmix') {
+    if (mode === 'vocab') {
       await saveWordMixHistory(history);
       return;
     }
@@ -687,7 +702,7 @@ export function AppProvider({ children }) {
     clearPendingWordSession,
     clearWordMixHistory: async () => {
       setHistory([]);
-      wordmixHistoryRef.current = [];
+      vocabHistoryRef.current = [];
       await saveWordMixHistory([]);
     },
   };
