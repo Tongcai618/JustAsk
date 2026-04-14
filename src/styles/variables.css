@@ -1,0 +1,191 @@
+/* ── Theme variables ─────────────────────────────────────── */
+/* Palette: forest #404e3b · sage #7b9669 · teal #6c8480 · mint #bac8b1 · silver #e6e6e6 */
+:root {
+  --bg: #0f1610;
+  --surface: #1a2319;
+  --card: #222d20;
+  --border: #2a3528;
+  --border-mid: #303b2e;
+  --border-strong: #3a4637;
+  --border-input: #404e3b;
+
+  --text: #e6e6e6;
+  --text-2: #bac8b1;
+  --text-3: #8a9a82;
+  --text-4: #6c8480;
+  --text-5: #5c6e58;
+  --text-6: #4a5a44;
+  --text-7: #3a4637;
+
+  --primary: #7b9669;
+  --primary-hover: #8ba679;
+  --primary-text: #e6e6e6;
+  --primary-bg-subtle: #7b966922;
+
+  --badge-bg: #404e3b;
+  --badge-text: #bac8b1;
+
+  --user-bubble-bg: #7b9669;
+  --user-bubble-text: #e6e6e6;
+  --asst-bubble-bg: #222d20;
+  --asst-bubble-text: #e6e6e6;
+  --asst-bubble-border: #3a4637;
+
+  --code-bg: #141c13;
+  --code-border: #3a4637;
+  --code-text: #bac8b1;
+
+  --error-bg: #2a1010;
+  --error-border: #5a2020;
+  --error-text: #ff8080;
+
+  --conv-hover: #222d20;
+  --conv-active: #2a3e27;
+  --conv-active-text: #bac8b1;
+  --conv-title: #8a9a82;
+  --conv-date: #5c6e58;
+  --conv-delete: #6c8480;
+  --conv-delete-hover: #ff6666;
+
+  --scrollbar: #3a4637;
+  --scrollbar-sm: #2a3528;
+
+  --strong: #e6e6e6;
+  --em: #bac8b1;
+  --link: #bac8b1;
+  --bq-border: #404e3b;
+  --bq-text: #8a9a82;
+  --table-header: #1a2319;
+
+  --disabled-bg: #222d20;
+  --disabled-text: #4a5a44;
+
+  --skeleton-from: #222d20;
+  --skeleton-mid: #2a3528;
+
+  --kbd-bg: #222d20;
+  --kbd-border: #3a4637;
+  --kbd-text: #bac8b1;
+
+  --tooltip-bg: #404e3b;
+  --tooltip-text: #e6e6e6;
+
+  --toggle-track: #3a4637;
+  --toggle-knob: #6c8480;
+
+  --chip-blue-bg: #2a3a3e;
+  --chip-blue-text: #6c8480;
+  --chip-green-bg: #2a3e27;
+  --chip-green-text: #7b9669;
+  --chip-red-bg: #3f1e1e;
+  --chip-red-text: #ef7a7a;
+  --chip-gray-bg: #3a4637;
+  --chip-gray-text: #8a9a82;
+
+  --avatar-blue-bg: #2a3a3e;
+  --avatar-blue-text: #6c8480;
+  --avatar-green-bg: #2a3e27;
+  --avatar-green-text: #7b9669;
+
+  --dev-badge-bg: #404e3b;
+  --dev-badge-text: #bac8b1;
+
+  --progress-blue: #6c8480;
+  --progress-green: #7b9669;
+  --progress-red: #994444;
+}
+
+[data-theme="light"] {
+  --bg: #f0f3ed;
+  --surface: #ffffff;
+  --card: #e8ede4;
+  --border: #d2daca;
+  --border-mid: #bac8b1;
+  --border-strong: #adbba4;
+  --border-input: #bac8b1;
+
+  --text: #404e3b;
+  --text-2: #4a5a44;
+  --text-3: #5c6e58;
+  --text-4: #6c8480;
+  --text-5: #8a9a82;
+  --text-6: #adbba4;
+  --text-7: #bac8b1;
+
+  --primary: #7b9669;
+  --primary-hover: #6b8659;
+  --primary-text: #ffffff;
+  --primary-bg-subtle: #7b966918;
+
+  --badge-bg: #dce6d5;
+  --badge-text: #4a5a44;
+
+  --user-bubble-bg: #7b9669;
+  --user-bubble-text: #ffffff;
+  --asst-bubble-bg: #e8ede4;
+  --asst-bubble-text: #404e3b;
+  --asst-bubble-border: #d2daca;
+
+  --code-bg: #edf2e9;
+  --code-border: #d2daca;
+  --code-text: #404e3b;
+
+  --error-bg: #fef2f2;
+  --error-border: #fca5a5;
+  --error-text: #dc2626;
+
+  --conv-hover: #e8ede4;
+  --conv-active: #d0dfc9;
+  --conv-active-text: #404e3b;
+  --conv-title: #5c6e58;
+  --conv-date: #8a9a82;
+  --conv-delete: #adbba4;
+  --conv-delete-hover: #dc2626;
+
+  --scrollbar: #bac8b1;
+  --scrollbar-sm: #d2daca;
+
+  --strong: #2e3a28;
+  --em: #5c6e58;
+  --link: #6c8480;
+  --bq-border: #bac8b1;
+  --bq-text: #6c8480;
+  --table-header: #e8ede4;
+
+  --disabled-bg: #d2daca;
+  --disabled-text: #8a9a82;
+
+  --skeleton-from: #d2daca;
+  --skeleton-mid: #e8ede4;
+
+  --kbd-bg: #e8ede4;
+  --kbd-border: #bac8b1;
+  --kbd-text: #404e3b;
+
+  --tooltip-bg: #404e3b;
+  --tooltip-text: #e6e6e6;
+
+  --toggle-track: #bac8b1;
+  --toggle-knob: #ffffff;
+
+  --chip-blue-bg: #d5e3e0;
+  --chip-blue-text: #4a6e68;
+  --chip-green-bg: #d0dfc9;
+  --chip-green-text: #4a6640;
+  --chip-red-bg: #fef2f2;
+  --chip-red-text: #dc2626;
+  --chip-gray-bg: #d2daca;
+  --chip-gray-text: #5c6e58;
+
+  --avatar-blue-bg: #d5e3e0;
+  --avatar-blue-text: #4a6e68;
+  --avatar-green-bg: #d0dfc9;
+  --avatar-green-text: #4a6640;
+
+  --dev-badge-bg: #dce6d5;
+  --dev-badge-text: #4a5a44;
+
+  --progress-blue: #6c8480;
+  --progress-green: #7b9669;
+  --progress-red: #dc2626;
+}

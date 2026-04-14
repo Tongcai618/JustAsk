@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 120">
+  <!-- Leaf body -->
+  <path fill="#7b9669" d="M50 6
+    C38 10, 18 24, 12 44
+    C6 62, 12 82, 28 94
+    C38 101, 52 102, 64 95
+    C80 85, 88 66, 86 46
+    C84 28, 70 10, 50 6 Z"/>
+  <!-- Midrib -->
+  <path fill="none" stroke="#404e3b" stroke-width="2.8" stroke-linecap="round"
+    d="M50 10 C48 38, 44 66, 36 104"/>
+</svg>

@@ -1,0 +1,260 @@
+/* ── WordMix button-driven UI ─────────────────────────── */
+.wmx-buttons {
+  padding: 10px 24px 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* ── Stats bar ───────────────────────────────────────── */
+.wmx-stats-bar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  font-size: 11px;
+  color: var(--text-5);
+}
+.wmx-stat { font-weight: 500; }
+.wmx-stat-due { color: var(--primary); font-weight: 600; }
+.wmx-stat-dot {
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: var(--text-6);
+}
+
+/* ── Review button ───────────────────────────────────── */
+.wmx-review-btn {
+  background: var(--primary-bg-subtle) !important;
+  border-color: var(--primary) !important;
+  color: var(--primary) !important;
+}
+.wmx-clear-btn {
+  background: none;
+  border: none;
+  color: var(--text-6);
+  font-size: 11px;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 4px;
+  transition: color 0.15s, background 0.15s;
+}
+.wmx-clear-btn:hover {
+  color: var(--error-text);
+  background: var(--error-bg);
+}
+
+.wmx-label {
+  font-size: 12px;
+  color: var(--text-4);
+  text-align: center;
+  font-weight: 500;
+}
+
+/* ── Level picker ────────────────────────────────────── */
+.wmx-level-row {
+  display: flex;
+  gap: 6px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.wmx-level-btn {
+  padding: 6px 16px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  border: 1px solid var(--border-strong);
+  background: var(--card);
+  color: var(--text-2);
+  transition: all 0.15s;
+}
+.wmx-level-btn:hover {
+  border-color: var(--primary);
+  background: var(--primary-bg-subtle);
+  color: var(--primary);
+}
+.wmx-level-all {
+  background: var(--primary-bg-subtle);
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+/* ── Word info card ──────────────────────────────────── */
+.wmx-word-card {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  flex-wrap: wrap;
+}
+.wmx-word {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text);
+}
+.wmx-pronunciation {
+  font-size: 12px;
+  color: var(--text-4);
+  font-family: "SF Mono", "Fira Code", Consolas, monospace;
+}
+.wmx-level-badge {
+  font-size: 10px;
+  font-weight: 600;
+  padding: 1px 6px;
+  border-radius: 4px;
+  background: var(--primary-bg-subtle);
+  color: var(--primary);
+}
+.wmx-pos {
+  font-size: 11px;
+  color: var(--text-5);
+  font-style: italic;
+}
+.wmx-rated {
+  font-size: 11px;
+  color: var(--primary);
+  font-weight: 500;
+  margin-left: auto;
+}
+
+/* ── Meaning reveal ──────────────────────────────────── */
+.wmx-meaning {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px;
+  background: var(--primary-bg-subtle);
+  border-radius: 8px;
+}
+.wmx-meaning-label {
+  font-size: 14px;
+}
+.wmx-meaning-text {
+  font-size: 14px;
+  color: var(--text);
+  font-weight: 500;
+  flex: 1;
+}
+
+/* ── Action buttons ──────────────────────────────────── */
+.wmx-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.wmx-rating-row {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.wmx-rate-btn {
+  width: 100%;
+  padding: 8px 14px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  border: 1px solid var(--border-strong);
+  background: var(--card);
+  color: var(--text-2);
+  transition: all 0.15s;
+  text-align: left;
+}
+.wmx-rate-btn:hover {
+  border-color: var(--primary);
+}
+.wmx-again { color: var(--chip-red-text); }
+.wmx-again:hover { background: var(--chip-red-bg); border-color: var(--chip-red-text); }
+.wmx-later { color: var(--chip-blue-text); }
+.wmx-later:hover { background: var(--chip-blue-bg); border-color: var(--chip-blue-text); }
+.wmx-dismiss { color: var(--chip-green-text); }
+.wmx-dismiss:hover { background: var(--chip-green-bg); border-color: var(--chip-green-text); }
+
+.wmx-nav-row {
+  display: flex;
+  gap: 6px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+.wmx-action-btn {
+  padding: 6px 14px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  border: 1px solid var(--border-strong);
+  background: none;
+  color: var(--text-3);
+  transition: all 0.15s;
+}
+.wmx-action-btn:hover {
+  color: var(--text);
+  border-color: var(--primary);
+}
+.wmx-action-btn:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+.wmx-action-primary {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: var(--primary-text);
+}
+.wmx-action-primary:hover {
+  background: var(--primary-hover);
+  border-color: var(--primary-hover);
+}
+.wmx-action-mix {
+  background: var(--primary-bg-subtle);
+  border-color: var(--primary);
+  color: var(--primary);
+}
+.wmx-action-mix:hover {
+  background: var(--primary);
+  color: var(--primary-text);
+}
+
+/* ── Highlighted words in chat ───────────────────────────────── */
+.wmx-hl-word {
+  text-decoration: underline;
+  text-decoration-style: dotted;
+  text-underline-offset: 3px;
+  cursor: pointer;
+  color: var(--primary);
+  transition: opacity 0.15s;
+}
+.wmx-hl-word:hover {
+  opacity: 0.7;
+}
+.wmx-hl-active {
+  opacity: 0.7;
+  font-weight: 600;
+}
+
+/* ── Inline word panel ───────────────────────────────────────── */
+.wmx-inline-panel {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background: var(--primary-bg-subtle);
+  border: 1px solid var(--primary);
+  border-radius: 8px;
+  flex-wrap: wrap;
+}
+.wmx-panel-word {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+}
+.wmx-panel-translation {
+  font-size: 13px;
+  color: var(--text-3);
+  flex: 1;
+}
