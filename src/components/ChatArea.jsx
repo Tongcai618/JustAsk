@@ -44,7 +44,10 @@ export default function ChatArea() {
 
   /* ── auto-scroll ------------------------------------------------ */
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    const timer = setTimeout(() => {
+      messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    }, 50);
+    return () => clearTimeout(timer);
   }, [history.length, isStreaming]);
 
   /* ── syntax highlighting ---------------------------------------- */

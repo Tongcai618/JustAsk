@@ -152,30 +152,31 @@
 }
 .wmx-rating-row {
   display: flex;
+  flex-direction: column;
   gap: 6px;
-  justify-content: center;
 }
 .wmx-rate-btn {
-  flex: 1;
-  padding: 8px 12px;
+  width: 100%;
+  padding: 8px 14px;
   border-radius: 8px;
   font-size: 13px;
-  font-weight: 600;
+  font-weight: 500;
   cursor: pointer;
   border: 1px solid var(--border-strong);
   background: var(--card);
   color: var(--text-2);
   transition: all 0.15s;
+  text-align: left;
 }
 .wmx-rate-btn:hover {
   border-color: var(--primary);
 }
-.wmx-hard { color: var(--chip-red-text); }
-.wmx-hard:hover { background: var(--chip-red-bg); border-color: var(--chip-red-text); }
-.wmx-okay { color: var(--chip-blue-text); }
-.wmx-okay:hover { background: var(--chip-blue-bg); border-color: var(--chip-blue-text); }
-.wmx-easy { color: var(--chip-green-text); }
-.wmx-easy:hover { background: var(--chip-green-bg); border-color: var(--chip-green-text); }
+.wmx-again { color: var(--chip-red-text); }
+.wmx-again:hover { background: var(--chip-red-bg); border-color: var(--chip-red-text); }
+.wmx-later { color: var(--chip-blue-text); }
+.wmx-later:hover { background: var(--chip-blue-bg); border-color: var(--chip-blue-text); }
+.wmx-dismiss { color: var(--chip-green-text); }
+.wmx-dismiss:hover { background: var(--chip-green-bg); border-color: var(--chip-green-text); }
 
 .wmx-nav-row {
   display: flex;

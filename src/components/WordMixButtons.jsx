@@ -1,12 +1,46 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useApp } from '../context/AppContext';
-import { pickRandom, getWord, getWords } from '../lib/wordbank';
+import { getWord, getWords } from '../lib/wordbank';
 import {
   scheduleReview,
   getDueWords,
   createEmptyProgress,
   updateStats,
+  getWordWeight,
 } from '../lib/srs';
+
+// Weighted random pick from an array
+function weightedPick(items, getWeight) {
+  const weights = items.map(getWeight);
+  const total = weights.reduce((a, b) => a + b, 0);
+  if (total === 0) return items.length > 0 ? items[Math.floor(Math.random() * items.length)] : null;
+  let r = Math.random() * total;
+  for (let i = 0; i < items.length; i++) {
+    r -= weights[i];
+    if (r <= 0) return items[i];
+  }
+  return items[items.length - 1];
+}
+
+// Weighted random pick of N items without replacement
+function weightedPickN(items, n, getWeight) {
+  const pool = [...items];
+  const picked = [];
+  while (picked.length < n && pool.length > 0) {
+    const weights = pool.map(getWeight);
+    const total = weights.reduce((a, b) => a + b, 0);
+    if (total === 0) break;
+    let r = Math.random() * total;
+    let idx = pool.length - 1;
+    for (let i = 0; i < pool.length; i++) {
+      r -= weights[i];
+      if (r <= 0) { idx = i; break; }
+    }
+    picked.push(pool[idx]);
+    pool.splice(idx, 1);
+  }
+  return picked;
+}
 
 const LEVELS = ['A1', 'A2', 'B1', 'B2', 'C1', 'All'];
 
@@ -83,7 +117,11 @@ export default function WordMixButtons() {
 
   const handlePickLevel = useCallback(
     (level) => {
-      const word = pickRandom(level === 'All' ? null : level);
+      const all = getWords();
+      const pool = level === 'All' ? all : all.filter((w) => w.level === level);
+      if (pool.length === 0) return;
+      const p = progressRef.current;
+      const word = weightedPick(pool, (w) => getWordWeight(p?.words?.[w.word]));
       if (!word) return;
       sendWordPrompt(word, level);
     },
@@ -172,16 +210,14 @@ export default function WordMixButtons() {
 
     const count = 5;
 
-    // Pick random studied words
-    const shuffled = [...studiedNames].sort(() => Math.random() - 0.5);
-    const picked = shuffled.slice(0, count);
+    // Weighted pick from studied words — overdue words more likely, dismissed excluded
+    const studiedWords = studiedNames.map((name) => getWord(name)).filter(Boolean);
+    const picked = weightedPickN(studiedWords, count, (w) => getWordWeight(p.words[w.word]));
+    if (picked.length < 3) return; // not enough non-dismissed words
 
     // Look up translations from word bank
     const wordList = picked
-      .map((name) => {
-        const w = getWord(name);
-        return w ? `${w.word}（${w.translation}）` : name;
-      })
+      .map((w) => `${w.word}（${w.translation}）`)
       .join('\n');
 
     const prompt = `你是一个中英混合写作助手。请用中文写一段话（3-5句话），把下列每个英文单词自然地嵌入句子中，替换掉它对应的中文意思：\n\n${wordList}\n\n要求：\n- 每个单词只出现一次\n- 段落要有一个统一的主题，内容连贯自然\n- 语气像一个中国人日常写作时偶尔夹杂英文\n- 每个英文单词的词性和语境必须正确\n- 不要解释单词的意思\n- 只输出段落，不要其他内容`;
@@ -267,14 +303,14 @@ export default function WordMixButtons() {
       {/* Rating buttons (only for single-word mode) */}
       {currentWord && !rated && (
         <div className="wmx-rating-row">
-          <button className="wmx-rate-btn wmx-hard" onClick={() => handleRate('hard')}>
-            Hard
+          <button className="wmx-rate-btn wmx-again" onClick={() => handleRate('again')}>
+            I want to see this word
           </button>
-          <button className="wmx-rate-btn wmx-okay" onClick={() => handleRate('okay')}>
-            Okay
+          <button className="wmx-rate-btn wmx-later" onClick={() => handleRate('later')}>
+            I may want to see this word in the future
           </button>
-          <button className="wmx-rate-btn wmx-easy" onClick={() => handleRate('easy')}>
-            Easy
+          <button className="wmx-rate-btn wmx-dismiss" onClick={() => handleRate('dismiss')}>
+            I don't want to see this word in the future
           </button>
         </div>
       )}
