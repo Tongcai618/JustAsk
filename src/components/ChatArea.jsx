@@ -42,6 +42,15 @@ export default function ChatArea() {
     setSelectedWordInfo(null);
   }, [selectedWordInfo, requestWordSession]);
 
+  const handlePanelWordRoots = useCallback(() => {
+    if (!selectedWordInfo) return;
+    sendMessage(
+      `请用中文自然地介绍英文单词「${selectedWordInfo.wordEntry.word}」的词根词缀：包括它的前缀（如果有）、词根来源、后缀（如果有），以及3-5个常见的同根词。用一段话描述，语气自然流畅。`,
+      { displayText: `Word Roots: ${selectedWordInfo.wordEntry.word}`, useMarkdown: true },
+    );
+    setSelectedWordInfo(null);
+  }, [selectedWordInfo, sendMessage]);
+
   /* ── auto-scroll ------------------------------------------------ */
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -179,6 +188,13 @@ export default function ChatArea() {
                 disabled={isStreaming}
               >
                 Another Example
+              </button>
+              <button
+                className="wmx-action-btn"
+                onClick={handlePanelWordRoots}
+                disabled={isStreaming}
+              >
+                Word Roots
               </button>
             </div>
           </div>

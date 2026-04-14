@@ -29,8 +29,6 @@
   background: var(--primary-bg-subtle) !important;
   border-color: var(--primary) !important;
   color: var(--primary) !important;
-  width: 100%;
-  max-width: 260px;
 }
 .wmx-clear-btn {
   background: none;

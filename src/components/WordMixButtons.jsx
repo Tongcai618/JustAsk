@@ -178,6 +178,14 @@ export default function WordMixButtons() {
     );
   }, [currentWord, sendMessage]);
 
+  const handleWordRoots = useCallback(() => {
+    if (!currentWord) return;
+    sendMessage(
+      `请用中文自然地介绍英文单词「${currentWord.word}」的词根词缀：包括它的前缀（如果有）、词根来源、后缀（如果有），以及3-5个常见的同根词。用一段话描述，语气自然流畅。`,
+      { displayText: `Word Roots: ${currentWord.word}`, useMarkdown: true },
+    );
+  }, [currentWord, sendMessage]);
+
   const handleChangeLevel = useCallback(() => {
     prevStateRef.current = { currentWord, currentLevel, rated };
     setCanGoBack(true);
@@ -261,25 +269,23 @@ export default function WordMixButtons() {
             </button>
           ))}
         </div>
-        {dueCount > 0 && (
+        {(dueCount > 0 || canGoBack || history.length > 0) && (
           <div className="wmx-level-row">
-            <button className="wmx-level-btn wmx-review-btn" onClick={handleReview}>
-              Review ({dueCount} due)
-            </button>
-          </div>
-        )}
-        {canGoBack && (
-          <div className="wmx-level-row">
-            <button className="wmx-action-btn" onClick={handleGoBack}>
-              ← Back
-            </button>
-          </div>
-        )}
-        {history.length > 0 && (
-          <div className="wmx-level-row">
-            <button className="wmx-clear-btn" onClick={clearWordMixHistory}>
-              Clear History
-            </button>
+            {dueCount > 0 && (
+              <button className="wmx-level-btn wmx-review-btn" onClick={handleReview}>
+                Review ({dueCount} due)
+              </button>
+            )}
+            {canGoBack && (
+              <button className="wmx-action-btn" onClick={handleGoBack}>
+                ← Back
+              </button>
+            )}
+            {history.length > 0 && (
+              <button className="wmx-clear-btn" onClick={clearWordMixHistory}>
+                Clear History
+              </button>
+            )}
           </div>
         )}
       </div>
@@ -324,6 +330,15 @@ export default function WordMixButtons() {
             disabled={isStreaming}
           >
             Another Example
+          </button>
+        )}
+        {currentWord && (
+          <button
+            className="wmx-action-btn"
+            onClick={handleWordRoots}
+            disabled={isStreaming}
+          >
+            Word Roots
           </button>
         )}
         <button
