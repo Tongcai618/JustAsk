@@ -4,10 +4,25 @@ import WordMixButtons from './WordMixButtons';
 import HighlightedMessage from './HighlightedMessage';
 
 /* ------------------------------------------------------------------ */
+/*  Helpers                                                            */
+/* ------------------------------------------------------------------ */
+
+// Parse AI output that contains "EN: ..." translation line
+// Returns { sentence, translation }
+function parseSentenceContent(content) {
+  const text = (content || '').trim();
+  const enIdx = text.search(/\nEN:/i);
+  if (enIdx === -1) return { sentence: text, translation: null };
+  const sentence = text.slice(0, enIdx).trim();
+  const translation = text.slice(enIdx).replace(/^\nEN:\s*/i, '').trim();
+  return { sentence, translation };
+}
+
+/* ------------------------------------------------------------------ */
 /*  ChatArea – main conversation view                                  */
 /* ------------------------------------------------------------------ */
 export default function ChatArea() {
-  const { history, isStreaming, currentModel, sendMessage, pendingNewChat, mode, requestWordSession } =
+  const { history, isStreaming, currentModel, sendMessage, pendingNewChat, mode, requestWordSession, apiBase } =
     useApp();
 
   const isWordMix = mode === 'vocab';
@@ -22,6 +37,83 @@ export default function ChatArea() {
 
   /* ── highlighted word panel state ------------------------------ */
   const [selectedWordInfo, setSelectedWordInfo] = useState(null);
+
+  /* ── english translation state --------------------------------- */
+  // { [msgIdx]: { shown: bool, text: string, loading: bool } }
+  const [translations, setTranslations] = useState({});
+
+  const handleToggleEnglish = useCallback(async (msgIdx, content, preloaded) => {
+    const current = translations[msgIdx];
+
+    // Hide if already shown
+    if (current?.shown) {
+      setTranslations((prev) => ({ ...prev, [msgIdx]: { ...prev[msgIdx], shown: false } }));
+      return;
+    }
+
+    // Use preloaded translation from the AI response (no extra API call)
+    if (preloaded) {
+      setTranslations((prev) => ({ ...prev, [msgIdx]: { shown: true, text: preloaded, loading: false } }));
+      return;
+    }
+
+    // Show cached translation without re-fetching
+    if (current?.text) {
+      setTranslations((prev) => ({ ...prev, [msgIdx]: { ...prev[msgIdx], shown: true } }));
+      return;
+    }
+
+    // Fetch translation from AI (fallback for messages without preloaded translation)
+    setTranslations((prev) => ({ ...prev, [msgIdx]: { shown: true, text: '', loading: true } }));
+
+    try {
+      const res = await fetch(`${apiBase}/api/chat`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          model: currentModel,
+          messages: [{ role: 'user', content: `请把以下中英混合句子翻译成完整自然的英文，只输出翻译结果，不要任何解释：\n\n${content}` }],
+          stream: true,
+        }),
+      });
+
+      const reader = res.body.getReader();
+      const decoder = new TextDecoder();
+      let buffer = '';
+      let fullText = '';
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+
+        buffer += decoder.decode(value, { stream: true });
+        const lines = buffer.split('\n');
+        buffer = lines.pop();
+
+        for (const line of lines) {
+          const trimmed = line.trim();
+          if (!trimmed || trimmed === 'data: [DONE]') continue;
+          if (trimmed.startsWith('data: ')) {
+            try {
+              const payload = JSON.parse(trimmed.slice(6));
+              if (payload.content) {
+                fullText += payload.content;
+                setTranslations((prev) => ({
+                  ...prev,
+                  [msgIdx]: { shown: true, text: fullText, loading: false },
+                }));
+              }
+            } catch { /* skip */ }
+          }
+        }
+      }
+    } catch {
+      setTranslations((prev) => ({
+        ...prev,
+        [msgIdx]: { shown: true, text: '(Translation failed)', loading: false },
+      }));
+    }
+  }, [translations, apiBase, currentModel]);
 
   const handleWordClick = useCallback((msgIdx, wordEntry, isSelected) => {
     setSelectedWordInfo(isSelected ? null : { msgIdx, wordEntry });
@@ -138,6 +230,11 @@ export default function ChatArea() {
 
     const isPanelOpen = selectedWordInfo?.msgIdx === idx;
 
+    // Parse sentence and pre-generated English translation from content
+    const { sentence, translation: preloadedTranslation } = useHighlight
+      ? parseSentenceContent(msg.content || '')
+      : { sentence: msg.content || '', translation: null };
+
     return (
       <div key={idx}>
         <div className={`msg-row ${msg.role}`}>
@@ -145,12 +242,27 @@ export default function ChatArea() {
             {msg.role === 'user' ? (
               userContent
             ) : useHighlight ? (
-              <HighlightedMessage
-                content={msg.content || ''}
-                msgIdx={idx}
-                selectedWordInfo={selectedWordInfo}
-                onWordClick={handleWordClick}
-              />
+              <>
+                <HighlightedMessage
+                  content={sentence}
+                  msgIdx={idx}
+                  selectedWordInfo={selectedWordInfo}
+                  onWordClick={handleWordClick}
+                />
+                <div className="en-translate-wrap">
+                  <button
+                    className="en-translate-btn"
+                    onClick={() => handleToggleEnglish(idx, sentence, preloadedTranslation)}
+                  >
+                    {translations[idx]?.shown ? 'Hide English' : 'Show English'}
+                  </button>
+                  {translations[idx]?.shown && (
+                    <div className="en-translate-text">
+                      {translations[idx]?.loading ? '…' : translations[idx]?.text}
+                    </div>
+                  )}
+                </div>
+              </>
             ) : (
               <div
                 dangerouslySetInnerHTML={{

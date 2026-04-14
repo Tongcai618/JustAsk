@@ -96,7 +96,7 @@ export default function WordMixButtons() {
       setRated(false);
       setPhase('waiting');
 
-      const prompt = `你是一个中英混合造句助手。请用中文造一个句子，句子中必须包含英文单词「${word.word}」，不能把它翻译成中文。\n\n要求：\n- 句子中必须出现英文「${word.word}」，不能用中文「${word.translation}」代替\n- 句子要自然、日常，像中国人说话时夹杂英文一样\n- 句子长度 15-30 个字\n- 不要解释这个单词的意思\n- 只输出句子，不要其他内容\n\n单词：${word.word}（${word.translation}）\n词性：${word.pos}`;
+      const prompt = `你是一个中英混合造句助手。请用中文造一个句子，句子中必须包含英文单词「${word.word}」，不能把它翻译成中文。\n\n要求：\n- 句子中必须出现英文「${word.word}」，不能用中文「${word.translation}」代替\n- 句子要自然、日常，像中国人说话时夹杂英文一样\n- 句子长度 15-30 个字\n- 不要解释这个单词的意思\n\n输出格式（严格按照以下两行输出，不要其他内容）：\n第一行：中英混合句子\nEN: 对应的完整英文翻译\n\n单词：${word.word}（${word.translation}）\n词性：${word.pos}`;
 
       const label = displayTextOverride ?? (level === 'Review' ? `Review: ${word.word}` : level === 'All' ? 'New word' : `New ${level} word`);
       sendMessage(prompt, { displayText: label, wordData: word });
@@ -228,7 +228,7 @@ export default function WordMixButtons() {
       .map((w) => `${w.word}（${w.translation}）`)
       .join('\n');
 
-    const prompt = `你是一个中英混合写作助手。请用中文写一段话（3-5句话），把下列每个英文单词自然地嵌入句子中，替换掉它对应的中文意思：\n\n${wordList}\n\n要求：\n- 每个单词只出现一次\n- 段落要有一个统一的主题，内容连贯自然\n- 语气像一个中国人日常写作时偶尔夹杂英文\n- 每个英文单词的词性和语境必须正确\n- 不要解释单词的意思\n- 只输出段落，不要其他内容`;
+    const prompt = `你是一个中英混合写作助手。请用中文写一段话（3-5句话），把下列每个英文单词自然地嵌入句子中，替换掉它对应的中文意思：\n\n${wordList}\n\n要求：\n- 每个单词只出现一次\n- 段落要有一个统一的主题，内容连贯自然\n- 语气像一个中国人日常写作时偶尔夹杂英文\n- 每个英文单词的词性和语境必须正确\n- 不要解释单词的意思\n\n输出格式（严格按照以下两部分输出，不要其他内容）：\n第一部分：中英混合段落\nEN: 对应的完整英文翻译`;
 
     setPhase('waiting');
     setCurrentWord(null);
