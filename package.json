@@ -1,8 +1,8 @@
 {
-  "name": "justask",
-  "productName": "JustAsk",
+  "name": "linbble",
+  "productName": "Linbble",
   "version": "2.0.0",
-  "description": "JustAsk — Desktop chat UI powered by Ollama",
+  "description": "Linbble — Desktop chat UI powered by Ollama",
   "main": "main.js",
   "scripts": {
     "dev": "vite",

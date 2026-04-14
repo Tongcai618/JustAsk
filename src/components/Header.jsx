@@ -14,7 +14,7 @@ export default function Header({ playgroundActive, onTogglePlayground, onOpenMan
 
   return (
     <header>
-      <h1>JustAsk</h1>
+      <h1>Linbble</h1>
 
       <ModelDropdown onOpenManage={onOpenManage} />
 

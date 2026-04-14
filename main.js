@@ -3,7 +3,7 @@ const http = require('http');
 const fs = require('fs');
 const path = require('path');
 
-app.setName('JustAsk');
+app.setName('Linbble');
 
 const MODEL = 'gemma4:e2b';
 const OLLAMA_URL = 'http://localhost:11434';
@@ -180,7 +180,7 @@ function createWindow() {
   mainWindow = new BrowserWindow({
     width: 1100,
     height: 700,
-    title: 'JustAsk',
+    title: 'Linbble',
     icon: path.join(__dirname, 'assets', 'icon.icns'),
     titleBarStyle: 'hiddenInset',
     trafficLightPosition: { x: 16, y: 16 },
