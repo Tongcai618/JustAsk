@@ -30,6 +30,24 @@ function writeConversations(conversations) {
   fs.writeFileSync(getHistoryPath(), JSON.stringify(conversations, null, 2), 'utf-8');
 }
 
+// ── WordMix progress storage ────────────────────────────────────────
+function getProgressPath() {
+  return path.join(app.getPath('userData'), 'wordmix-progress.json');
+}
+
+function readProgress() {
+  try {
+    const raw = fs.readFileSync(getProgressPath(), 'utf-8');
+    return JSON.parse(raw);
+  } catch {
+    return null;
+  }
+}
+
+function writeProgress(data) {
+  fs.writeFileSync(getProgressPath(), JSON.stringify(data, null, 2), 'utf-8');
+}
+
 // ── Ollama proxy server ──────────────────────────────────────────────
 function startProxy() {
   const server = http.createServer((req, res) => {
@@ -313,6 +331,15 @@ ipcMain.handle('delete-model', (_event, model) => {
     req.write(payload);
     req.end();
   });
+});
+
+ipcMain.handle('load-progress', () => {
+  return readProgress();
+});
+
+ipcMain.handle('save-progress', (_event, data) => {
+  writeProgress(data);
+  return true;
 });
 
 ipcMain.handle('pause-pull', (_event, model) => {

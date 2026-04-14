@@ -9,4 +9,6 @@ contextBridge.exposeInMainWorld('electronAPI', {
   onPullProgress: (cb) => ipcRenderer.on('pull-progress', (_e, data) => cb(data)),
   pausePull: (model) => ipcRenderer.invoke('pause-pull', model),
   deleteModel: (model) => ipcRenderer.invoke('delete-model', model),
+  loadProgress: () => ipcRenderer.invoke('load-progress'),
+  saveProgress: (data) => ipcRenderer.invoke('save-progress', data),
 });

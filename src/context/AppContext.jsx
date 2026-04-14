@@ -49,6 +49,64 @@ export function AppProvider({ children }) {
   const [isStreaming, setIsStreaming] = useState(false);
   const [pendingNewChat, setPendingNewChat] = useState(false);
 
+  /* ── app mode ---------------------------------------------------- */
+  const [mode, setModeState] = useState('chat'); // 'chat' | 'wordmix'
+
+  // Stash chat state when switching to wordmix, restore when switching back
+  const chatStashRef = useRef({ history: [], currentConvId: null, pendingNewChat: false });
+  const wordmixHistoryRef = useRef([]);
+  const wordmixLoadedRef = useRef(false);
+
+  // Load the single persistent WordMix history from disk
+  const loadWordMixHistory = useCallback(async () => {
+    if (wordmixLoadedRef.current) return wordmixHistoryRef.current;
+    try {
+      if (window.electronAPI?.loadProgress) {
+        const data = await window.electronAPI.loadProgress();
+        if (data?.wordmixHistory) {
+          wordmixHistoryRef.current = data.wordmixHistory;
+        }
+      }
+    } catch { /* ignore */ }
+    wordmixLoadedRef.current = true;
+    return wordmixHistoryRef.current;
+  }, []);
+
+  // Save the single persistent WordMix history to disk
+  const saveWordMixHistory = useCallback(async (wmHistory) => {
+    wordmixHistoryRef.current = wmHistory;
+    try {
+      if (window.electronAPI?.loadProgress) {
+        const data = (await window.electronAPI.loadProgress()) || {};
+        data.wordmixHistory = wmHistory;
+        await window.electronAPI.saveProgress(data);
+      }
+    } catch { /* ignore */ }
+  }, []);
+
+  const setMode = useCallback(async (nextMode) => {
+    if (mode === nextMode) return;
+
+    if (mode === 'chat' && nextMode === 'wordmix') {
+      // Stash current chat state
+      chatStashRef.current = { history, currentConvId, pendingNewChat };
+      // Load persistent wordmix history
+      const wmHistory = await loadWordMixHistory();
+      setHistory(wmHistory);
+      setCurrentConvId(null);
+      setPendingNewChat(false);
+    } else if (mode === 'wordmix' && nextMode === 'chat') {
+      // Save wordmix history to disk
+      await saveWordMixHistory(history);
+      // Restore chat state
+      setHistory(chatStashRef.current.history);
+      setCurrentConvId(chatStashRef.current.currentConvId);
+      setPendingNewChat(chatStashRef.current.pendingNewChat);
+    }
+
+    setModeState(nextMode);
+  }, [mode, history, currentConvId, pendingNewChat, loadWordMixHistory, saveWordMixHistory]);
+
   /* ── refs -------------------------------------------------------- */
   const speedIntervalsRef = useRef({});     // model -> intervalId
   const prevCompletedRef = useRef({});      // model -> last rawCompleted
@@ -268,22 +326,33 @@ export function AppProvider({ children }) {
   /* ================================================================ */
   /*  Conversation management                                         */
   /* ================================================================ */
-  const newChat = useCallback(() => {
+  const newChat = useCallback(async () => {
+    // If in wordmix mode, save and switch to chat
+    if (mode === 'wordmix') {
+      await saveWordMixHistory(history);
+      setModeState('chat');
+    }
     setHistory([]);
     setCurrentConvId(null);
     setPendingNewChat(true);
-  }, []);
+  }, [mode, history, saveWordMixHistory]);
 
   const loadConversation = useCallback(
-    (id) => {
+    async (id) => {
       const conv = conversations.find((c) => c.id === id);
-      if (conv) {
-        setHistory(conv.messages || []);
-        setCurrentConvId(id);
-        setPendingNewChat(false);
+      if (!conv) return;
+
+      // Loading a sidebar conversation always goes to chat mode
+      if (mode === 'wordmix') {
+        await saveWordMixHistory(history);
+        setModeState('chat');
       }
+
+      setHistory(conv.messages || []);
+      setCurrentConvId(id);
+      setPendingNewChat(false);
     },
-    [conversations],
+    [conversations, mode, history, saveWordMixHistory],
   );
 
   const deleteConversation = useCallback(
@@ -305,6 +374,12 @@ export function AppProvider({ children }) {
   const saveCurrentConversation = useCallback(async () => {
     if (history.length === 0) return;
 
+    // WordMix saves separately — not to the sidebar conversation list
+    if (mode === 'wordmix') {
+      await saveWordMixHistory(history);
+      return;
+    }
+
     const id = currentConvId || generateId();
     const conv = {
       id,
@@ -320,24 +395,26 @@ export function AppProvider({ children }) {
     } catch {
       /* ignore */
     }
-  }, [history, currentConvId]);
+  }, [history, currentConvId, mode, saveWordMixHistory]);
 
   /* ================================================================ */
   /*  Send message (SSE streaming chat)                               */
   /* ================================================================ */
   const sendMessage = useCallback(
-    async (text) => {
+    async (text, { displayText, wordData } = {}) => {
       if (!text.trim() || isStreaming) return;
 
-      const userMsg = { role: 'user', content: text.trim() };
+      // displayText: what the user bubble shows (optional, defaults to the full text)
+      // wordData: word bank entry to attach to the assistant response (for WordMix)
+      const userMsg = { role: 'user', content: text.trim(), displayText: displayText || undefined };
       const nextHistory = [...history, userMsg];
       setHistory(nextHistory);
       setPendingNewChat(false);
       setIsStreaming(true);
       streamTextRef.current = '';
 
-      // Add a placeholder assistant message
-      setHistory((prev) => [...prev, { role: 'assistant', content: '' }]);
+      // Add a placeholder assistant message (with wordData if provided)
+      setHistory((prev) => [...prev, { role: 'assistant', content: '', wordData: wordData || undefined }]);
 
       const controller = new AbortController();
       abortRef.current = controller;
@@ -388,7 +465,7 @@ export function AppProvider({ children }) {
                 setHistory((prev) => {
                   const updated = [...prev];
                   updated[updated.length - 1] = {
-                    role: 'assistant',
+                    ...updated[updated.length - 1],
                     content: fullText,
                   };
                   return updated;
@@ -407,7 +484,7 @@ export function AppProvider({ children }) {
           setHistory((prev) => {
             const updated = [...prev];
             updated[updated.length - 1] = {
-              role: 'assistant',
+              ...updated[updated.length - 1],
               content: errorText,
             };
             return updated;
@@ -576,9 +653,11 @@ export function AppProvider({ children }) {
     history,
     isStreaming,
     pendingNewChat,
+    mode,
 
     // actions
     setTheme,
+    setMode,
     selectModel,
     fetchLocalModels,
     pullModel,
@@ -593,6 +672,11 @@ export function AppProvider({ children }) {
     deleteConversation,
     saveCurrentConversation,
     sendMessage,
+    clearWordMixHistory: async () => {
+      setHistory([]);
+      wordmixHistoryRef.current = [];
+      await saveWordMixHistory([]);
+    },
   };
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;

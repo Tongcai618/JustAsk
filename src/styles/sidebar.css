@@ -71,6 +71,13 @@
 .conv-item:hover .conv-delete { display: block; }
 .conv-item .conv-delete:hover { color: var(--conv-delete-hover); }
 
+.conv-type-icon {
+  flex-shrink: 0;
+  color: var(--primary);
+  display: flex;
+  align-items: center;
+}
+
 .no-history {
   padding: 20px 16px;
   text-align: center;
