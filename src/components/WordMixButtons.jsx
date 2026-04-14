@@ -11,13 +11,12 @@ import {
 const LEVELS = ['A1', 'A2', 'B1', 'B2', 'C1', 'All'];
 
 export default function WordMixButtons() {
-  const { isStreaming, sendMessage, history, clearWordMixHistory } = useApp();
+  const { isStreaming, sendMessage, history, clearWordMixHistory, pendingWordSession, clearPendingWordSession } = useApp();
 
   const [phase, setPhase] = useState('pick-level'); // 'pick-level' | 'waiting' | 'learning'
   const [currentWord, setCurrentWord] = useState(null);
   const [currentLevel, setCurrentLevel] = useState(null);
   const [rated, setRated] = useState(false);
-  const [meaningShown, setMeaningShown] = useState(false);
   const [progress, setProgress] = useState(null);
   const [dueCount, setDueCount] = useState(0);
   const progressRef = useRef(null);
@@ -61,7 +60,6 @@ export default function WordMixButtons() {
       setCurrentWord(word);
       setCurrentLevel(level);
       setRated(false);
-      setMeaningShown(false);
       setPhase('waiting');
 
       const prompt = `你是一个中英混合造句助手。请用中文造一个句子，句子中必须包含英文单词「${word.word}」，不能把它翻译成中文。\n\n要求：\n- 句子中必须出现英文「${word.word}」，不能用中文「${word.translation}」代替\n- 句子要自然、日常，像中国人说话时夹杂英文一样\n- 句子长度 15-30 个字\n- 不要解释这个单词的意思\n- 只输出句子，不要其他内容\n\n单词：${word.word}（${word.translation}）\n词性：${word.pos}`;
@@ -71,6 +69,17 @@ export default function WordMixButtons() {
     },
     [sendMessage],
   );
+
+  // Handle word session requested from chat panel (must be after sendWordPrompt)
+  useEffect(() => {
+    if (!pendingWordSession) return;
+    clearPendingWordSession();
+    sendWordPrompt(
+      pendingWordSession.word,
+      pendingWordSession.level,
+      `Another example: ${pendingWordSession.word.word}`,
+    );
+  }, [pendingWordSession, clearPendingWordSession, sendWordPrompt]);
 
   const handlePickLevel = useCallback(
     (level) => {
@@ -118,10 +127,6 @@ export default function WordMixButtons() {
     [currentWord, saveProgress],
   );
 
-  const handleToggleMeaning = useCallback(() => {
-    setMeaningShown((prev) => !prev);
-  }, []);
-
   const handleNewSentence = useCallback(() => {
     if (!currentWord) return;
     sendWordPrompt(currentWord, currentLevel, `Another example: ${currentWord.word}`);
@@ -131,18 +136,17 @@ export default function WordMixButtons() {
     if (!currentWord) return;
     sendMessage(
       `请用中文详细解释英文单词「${currentWord.word}」的意思、用法和常见搭配。`,
-      { displayText: `Explain ${currentWord.word}` },
+      { displayText: `Explain ${currentWord.word}`, useMarkdown: true },
     );
   }, [currentWord, sendMessage]);
 
   const handleChangeLevel = useCallback(() => {
-    prevStateRef.current = { currentWord, currentLevel, rated, meaningShown };
+    prevStateRef.current = { currentWord, currentLevel, rated };
     setCanGoBack(true);
     setPhase('pick-level');
     setCurrentWord(null);
     setRated(false);
-    setMeaningShown(false);
-  }, [currentWord, currentLevel, rated, meaningShown]);
+  }, [currentWord, currentLevel, rated]);
 
   const handleGoBack = useCallback(() => {
     const prev = prevStateRef.current;
@@ -150,7 +154,6 @@ export default function WordMixButtons() {
     setCurrentWord(prev.currentWord);
     setCurrentLevel(prev.currentLevel);
     setRated(prev.rated);
-    setMeaningShown(prev.meaningShown);
     setPhase('learning');
     prevStateRef.current = null;
     setCanGoBack(false);
@@ -186,7 +189,6 @@ export default function WordMixButtons() {
     setPhase('waiting');
     setCurrentWord(null);
     setRated(false);
-    setMeaningShown(false);
     sendMessage(prompt, { displayText: 'Story Mode' });
   }, [sendMessage]);
 
@@ -262,21 +264,6 @@ export default function WordMixButtons() {
     <div className="wmx-buttons">
       {statsBar}
 
-      {/* Meaning reveal */}
-      {meaningShown && currentWord && (
-        <div className="wmx-meaning">
-          <span className="wmx-meaning-label">💡</span>
-          <span className="wmx-meaning-text">{currentWord.translation}</span>
-          <button
-            className="wmx-action-btn"
-            onClick={handleExplainMore}
-            disabled={isStreaming}
-          >
-            Explain More
-          </button>
-        </div>
-      )}
-
       {/* Rating buttons (only for single-word mode) */}
       {currentWord && !rated && (
         <div className="wmx-rating-row">
@@ -294,15 +281,6 @@ export default function WordMixButtons() {
 
       {/* Navigation buttons — locked until rated (for single-word mode) */}
       <div className="wmx-nav-row">
-        {currentWord && (
-          <button
-            className="wmx-action-btn"
-            onClick={handleToggleMeaning}
-            disabled={!rated}
-          >
-            {meaningShown ? 'Hide Meaning' : 'Show Meaning'}
-          </button>
-        )}
         {currentWord && (
           <button
             className="wmx-action-btn"

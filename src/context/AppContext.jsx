@@ -52,6 +52,15 @@ export function AppProvider({ children }) {
   /* ── app mode ---------------------------------------------------- */
   const [mode, setModeState] = useState('chat'); // 'chat' | 'wordmix'
 
+  /* ── word session request (from chat panel → WordMixButtons) ----- */
+  const [pendingWordSession, setPendingWordSession] = useState(null);
+  const requestWordSession = useCallback((word, level) => {
+    setPendingWordSession({ word, level });
+  }, []);
+  const clearPendingWordSession = useCallback(() => {
+    setPendingWordSession(null);
+  }, []);
+
   // Stash chat state when switching to wordmix, restore when switching back
   const chatStashRef = useRef({ history: [], currentConvId: null, pendingNewChat: false });
   const wordmixHistoryRef = useRef([]);
@@ -401,11 +410,12 @@ export function AppProvider({ children }) {
   /*  Send message (SSE streaming chat)                               */
   /* ================================================================ */
   const sendMessage = useCallback(
-    async (text, { displayText, wordData } = {}) => {
+    async (text, { displayText, wordData, useMarkdown } = {}) => {
       if (!text.trim() || isStreaming) return;
 
       // displayText: what the user bubble shows (optional, defaults to the full text)
       // wordData: word bank entry to attach to the assistant response (for WordMix)
+      // useMarkdown: if true, render the assistant response with markdown (e.g. Explain More)
       const userMsg = { role: 'user', content: text.trim(), displayText: displayText || undefined };
       const nextHistory = [...history, userMsg];
       setHistory(nextHistory);
@@ -413,8 +423,8 @@ export function AppProvider({ children }) {
       setIsStreaming(true);
       streamTextRef.current = '';
 
-      // Add a placeholder assistant message (with wordData if provided)
-      setHistory((prev) => [...prev, { role: 'assistant', content: '', wordData: wordData || undefined }]);
+      // Add a placeholder assistant message (with wordData/useMarkdown if provided)
+      setHistory((prev) => [...prev, { role: 'assistant', content: '', wordData: wordData || undefined, useMarkdown: useMarkdown || undefined }]);
 
       const controller = new AbortController();
       abortRef.current = controller;
@@ -672,6 +682,9 @@ export function AppProvider({ children }) {
     deleteConversation,
     saveCurrentConversation,
     sendMessage,
+    pendingWordSession,
+    requestWordSession,
+    clearPendingWordSession,
     clearWordMixHistory: async () => {
       setHistory([]);
       wordmixHistoryRef.current = [];

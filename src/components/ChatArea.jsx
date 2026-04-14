@@ -1,12 +1,13 @@
 import React, { useRef, useEffect, useState, useCallback } from 'react';
 import { useApp } from '../context/AppContext';
 import WordMixButtons from './WordMixButtons';
+import HighlightedMessage from './HighlightedMessage';
 
 /* ------------------------------------------------------------------ */
 /*  ChatArea – main conversation view                                  */
 /* ------------------------------------------------------------------ */
 export default function ChatArea() {
-  const { history, isStreaming, currentModel, sendMessage, pendingNewChat, mode } =
+  const { history, isStreaming, currentModel, sendMessage, pendingNewChat, mode, requestWordSession } =
     useApp();
 
   const isWordMix = mode === 'wordmix';
@@ -18,6 +19,28 @@ export default function ChatArea() {
 
   /* ── local input state ------------------------------------------ */
   const [input, setInput] = useState('');
+
+  /* ── highlighted word panel state ------------------------------ */
+  const [selectedWordInfo, setSelectedWordInfo] = useState(null);
+
+  const handleWordClick = useCallback((msgIdx, wordEntry, isSelected) => {
+    setSelectedWordInfo(isSelected ? null : { msgIdx, wordEntry });
+  }, []);
+
+  const handlePanelExplainMore = useCallback(() => {
+    if (!selectedWordInfo) return;
+    sendMessage(
+      `请用中文详细解释英文单词「${selectedWordInfo.wordEntry.word}」的意思、用法和常见搭配。`,
+      { displayText: `Explain ${selectedWordInfo.wordEntry.word}`, useMarkdown: true },
+    );
+    setSelectedWordInfo(null);
+  }, [selectedWordInfo, sendMessage]);
+
+  const handlePanelAnotherExample = useCallback(() => {
+    if (!selectedWordInfo) return;
+    requestWordSession(selectedWordInfo.wordEntry, 'All');
+    setSelectedWordInfo(null);
+  }, [selectedWordInfo, requestWordSession]);
 
   /* ── auto-scroll ------------------------------------------------ */
   useEffect(() => {
@@ -93,8 +116,15 @@ export default function ChatArea() {
     const showWordCard =
       msg.role === 'assistant' && msg.wordData && !(isLastAssistant && isStreaming);
 
+    // WordMix assistant messages use HighlightedMessage (after streaming finishes)
+    // unless the message is flagged useMarkdown (e.g. Explain More responses)
+    const useHighlight =
+      isWordMix && msg.role === 'assistant' && !msg.useMarkdown && !(isLastAssistant && isStreaming);
+
     // Use displayText for user bubbles if available (WordMix mode)
     const userContent = msg.displayText || msg.content;
+
+    const isPanelOpen = selectedWordInfo?.msgIdx === idx;
 
     return (
       <div key={idx}>
@@ -102,6 +132,13 @@ export default function ChatArea() {
           <div className={bubbleClass}>
             {msg.role === 'user' ? (
               userContent
+            ) : useHighlight ? (
+              <HighlightedMessage
+                content={msg.content || ''}
+                msgIdx={idx}
+                selectedWordInfo={selectedWordInfo}
+                onWordClick={handleWordClick}
+              />
             ) : (
               <div
                 dangerouslySetInnerHTML={{
@@ -118,6 +155,28 @@ export default function ChatArea() {
               <span className="wmx-pronunciation">{msg.wordData.pronunciation}</span>
               <span className="wmx-level-badge">{msg.wordData.level}</span>
               <span className="wmx-pos">{msg.wordData.pos}</span>
+            </div>
+          </div>
+        )}
+        {useHighlight && isPanelOpen && (
+          <div className="msg-row assistant">
+            <div className="wmx-inline-panel">
+              <span className="wmx-panel-word">{selectedWordInfo.wordEntry.word}</span>
+              <span className="wmx-panel-translation">{selectedWordInfo.wordEntry.translation}</span>
+              <button
+                className="wmx-action-btn"
+                onClick={handlePanelExplainMore}
+                disabled={isStreaming}
+              >
+                Explain More
+              </button>
+              <button
+                className="wmx-action-btn wmx-action-primary"
+                onClick={handlePanelAnotherExample}
+                disabled={isStreaming}
+              >
+                Another Example
+              </button>
             </div>
           </div>
         )}

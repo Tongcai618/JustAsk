@@ -220,3 +220,42 @@
   background: var(--primary);
   color: var(--primary-text);
 }
+
+/* ── Highlighted words in chat ───────────────────────────────── */
+.wmx-hl-word {
+  text-decoration: underline;
+  text-decoration-style: dotted;
+  text-underline-offset: 3px;
+  cursor: pointer;
+  color: var(--primary);
+  transition: opacity 0.15s;
+}
+.wmx-hl-word:hover {
+  opacity: 0.7;
+}
+.wmx-hl-active {
+  opacity: 0.7;
+  font-weight: 600;
+}
+
+/* ── Inline word panel ───────────────────────────────────────── */
+.wmx-inline-panel {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background: var(--primary-bg-subtle);
+  border: 1px solid var(--primary);
+  border-radius: 8px;
+  flex-wrap: wrap;
+}
+.wmx-panel-word {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+}
+.wmx-panel-translation {
+  font-size: 13px;
+  color: var(--text-3);
+  flex: 1;
+}
