@@ -21,6 +21,8 @@ export default function WordMixButtons() {
   const [progress, setProgress] = useState(null);
   const [dueCount, setDueCount] = useState(0);
   const progressRef = useRef(null);
+  const prevStateRef = useRef(null);
+  const [canGoBack, setCanGoBack] = useState(false);
 
   // Load progress on mount
   useEffect(() => {
@@ -62,7 +64,7 @@ export default function WordMixButtons() {
       setMeaningShown(false);
       setPhase('waiting');
 
-      const prompt = `你是一个中英混合造句助手。请用中文造一个自然的句子，但是把「${word.translation}」替换成英文单词「${word.word}」。\n\n要求：\n- 句子要自然、日常，像中国人说话时夹杂英文一样\n- 句子长度 15-30 个字\n- 不要解释这个单词的意思\n- 只输出句子，不要其他内容\n\n单词：${word.word}（${word.translation}）\n词性：${word.pos}`;
+      const prompt = `你是一个中英混合造句助手。请用中文造一个句子，句子中必须包含英文单词「${word.word}」，不能把它翻译成中文。\n\n要求：\n- 句子中必须出现英文「${word.word}」，不能用中文「${word.translation}」代替\n- 句子要自然、日常，像中国人说话时夹杂英文一样\n- 句子长度 15-30 个字\n- 不要解释这个单词的意思\n- 只输出句子，不要其他内容\n\n单词：${word.word}（${word.translation}）\n词性：${word.pos}`;
 
       const label = displayTextOverride ?? (level === 'Review' ? `Review: ${word.word}` : level === 'All' ? 'New word' : `New ${level} word`);
       sendMessage(prompt, { displayText: label, wordData: word });
@@ -122,7 +124,7 @@ export default function WordMixButtons() {
 
   const handleNewSentence = useCallback(() => {
     if (!currentWord) return;
-    sendWordPrompt(currentWord, currentLevel, `New sentence: ${currentWord.word}`);
+    sendWordPrompt(currentWord, currentLevel, `Another example: ${currentWord.word}`);
   }, [currentWord, currentLevel, sendWordPrompt]);
 
   const handleExplainMore = useCallback(() => {
@@ -134,28 +136,38 @@ export default function WordMixButtons() {
   }, [currentWord, sendMessage]);
 
   const handleChangeLevel = useCallback(() => {
+    prevStateRef.current = { currentWord, currentLevel, rated, meaningShown };
+    setCanGoBack(true);
     setPhase('pick-level');
     setCurrentWord(null);
     setRated(false);
     setMeaningShown(false);
+  }, [currentWord, currentLevel, rated, meaningShown]);
+
+  const handleGoBack = useCallback(() => {
+    const prev = prevStateRef.current;
+    if (!prev) return;
+    setCurrentWord(prev.currentWord);
+    setCurrentLevel(prev.currentLevel);
+    setRated(prev.rated);
+    setMeaningShown(prev.meaningShown);
+    setPhase('learning');
+    prevStateRef.current = null;
+    setCanGoBack(false);
   }, []);
 
   // --- Mixed paragraph ---
   const studiedWordCount = progress?.words ? Object.keys(progress.words).length : 0;
-  const canMixParagraph = studiedWordCount >= 3;
+  const canMixParagraph = studiedWordCount >= 5;
 
   const handleMixedParagraph = useCallback(() => {
     const p = progressRef.current;
     if (!p?.words) return;
 
     const studiedNames = Object.keys(p.words);
-    if (studiedNames.length < 3) return;
+    if (studiedNames.length < 5) return;
 
-    // Auto-scale word count
-    let count;
-    if (studiedNames.length <= 5) count = 3;
-    else if (studiedNames.length <= 15) count = 5;
-    else count = Math.min(10, studiedNames.length);
+    const count = 5;
 
     // Pick random studied words
     const shuffled = [...studiedNames].sort(() => Math.random() - 0.5);
@@ -169,13 +181,13 @@ export default function WordMixButtons() {
       })
       .join('\n');
 
-    const prompt = `你是一个中英混合写作助手。请用中文写一段话（3-5句话），但是把以下单词用英文替换对应的中文：\n\n${wordList}\n\n要求：\n- 段落要自然流畅，像一个中国人日常写作时夹杂英文一样\n- 所有英文单词都要用对，词性和语境正确\n- 不要解释单词的意思\n- 只输出段落，不要其他内容`;
+    const prompt = `你是一个中英混合写作助手。请用中文写一段话（3-5句话），把下列每个英文单词自然地嵌入句子中，替换掉它对应的中文意思：\n\n${wordList}\n\n要求：\n- 每个单词只出现一次\n- 段落要有一个统一的主题，内容连贯自然\n- 语气像一个中国人日常写作时偶尔夹杂英文\n- 每个英文单词的词性和语境必须正确\n- 不要解释单词的意思\n- 只输出段落，不要其他内容`;
 
     setPhase('waiting');
     setCurrentWord(null);
     setRated(false);
     setMeaningShown(false);
-    sendMessage(prompt, { displayText: `Mix ${count} words into a paragraph` });
+    sendMessage(prompt, { displayText: 'Story Mode' });
   }, [sendMessage]);
 
   // --- Stats bar ---
@@ -215,6 +227,13 @@ export default function WordMixButtons() {
           <div className="wmx-level-row">
             <button className="wmx-level-btn wmx-review-btn" onClick={handleReview}>
               Review ({dueCount} due)
+            </button>
+          </div>
+        )}
+        {canGoBack && (
+          <div className="wmx-level-row">
+            <button className="wmx-action-btn" onClick={handleGoBack}>
+              ← Back
             </button>
           </div>
         )}
@@ -290,7 +309,7 @@ export default function WordMixButtons() {
             onClick={handleNewSentence}
             disabled={isStreaming}
           >
-            New Sentence
+            Another Example
           </button>
         )}
         <button
@@ -306,7 +325,7 @@ export default function WordMixButtons() {
             onClick={handleMixedParagraph}
             disabled={isStreaming || (currentWord && !rated)}
           >
-            Mix My Words
+            Story Mode
           </button>
         )}
         <button
