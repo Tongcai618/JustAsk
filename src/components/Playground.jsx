@@ -149,6 +149,7 @@ export default function Playground({ visible }) {
                 <span className="pg-chip gray">
                   Draft <span className="chip-x">&times;</span>
                 </span>
+                <span className="pg-chip coffee">Vocab</span>
               </div>
             </div>
           </div>
@@ -749,6 +750,13 @@ const response = await fetch('/api/chat', {
                 style={{ background: 'var(--error-text)' }}
               />
               <span className="pg-swatch-label">error</span>
+            </div>
+            <div className="pg-swatch">
+              <div
+                className="pg-swatch-box"
+                style={{ background: 'var(--coffee)' }}
+              />
+              <span className="pg-swatch-label">coffee</span>
             </div>
           </div>
         </div>

@@ -268,14 +268,14 @@ export default function WordMixButtons() {
               {level}
             </button>
           ))}
+          {dueCount > 0 && (
+            <button className="wmx-level-btn wmx-review-btn" onClick={handleReview}>
+              Review ({dueCount} due)
+            </button>
+          )}
         </div>
-        {(dueCount > 0 || canGoBack || history.length > 0) && (
+        {(canGoBack || history.length > 0) && (
           <div className="wmx-level-row">
-            {dueCount > 0 && (
-              <button className="wmx-level-btn wmx-review-btn" onClick={handleReview}>
-                Review ({dueCount} due)
-              </button>
-            )}
             {canGoBack && (
               <button className="wmx-action-btn" onClick={handleGoBack}>
                 ← Back

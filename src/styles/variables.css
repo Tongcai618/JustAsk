@@ -1,5 +1,5 @@
 /* ── Theme variables ─────────────────────────────────────── */
-/* Palette: forest #404e3b · sage #7b9669 · teal #6c8480 · mint #bac8b1 · silver #e6e6e6 */
+/* Palette: forest #404e3b · sage #7b9669 · teal #6c8480 · mint #bac8b1 · silver #e6e6e6 · coffee #c8956c */
 :root {
   --bg: #0f1610;
   --surface: #1a2319;
@@ -72,6 +72,12 @@
 
   --toggle-track: #3a4637;
   --toggle-knob: #6c8480;
+
+  --coffee: #c8956c;
+  --coffee-hover: #d8a57c;
+  --coffee-subtle: #c8956c22;
+  --chip-coffee-bg: #3e2a1a;
+  --chip-coffee-text: #c8956c;
 
   --chip-blue-bg: #2a3a3e;
   --chip-blue-text: #6c8480;
@@ -167,6 +173,12 @@
 
   --toggle-track: #bac8b1;
   --toggle-knob: #ffffff;
+
+  --coffee: #a0724a;
+  --coffee-hover: #8a6238;
+  --coffee-subtle: #a0724a18;
+  --chip-coffee-bg: #f3e5d8;
+  --chip-coffee-text: #7a4e28;
 
   --chip-blue-bg: #d5e3e0;
   --chip-blue-text: #4a6e68;

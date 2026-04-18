@@ -254,7 +254,7 @@
   text-decoration-style: dotted;
   text-underline-offset: 3px;
   cursor: pointer;
-  color: var(--primary);
+  color: var(--coffee);
   transition: opacity 0.15s;
 }
 .wmx-hl-word:hover {

@@ -138,6 +138,7 @@
 .pg-chip.green { background: var(--chip-green-bg); color: var(--chip-green-text); }
 .pg-chip.red { background: var(--chip-red-bg); color: var(--chip-red-text); }
 .pg-chip.gray { background: var(--chip-gray-bg); color: var(--chip-gray-text); }
+.pg-chip.coffee { background: var(--chip-coffee-bg); color: var(--chip-coffee-text); }
 .pg-chip .chip-x {
   cursor: pointer;
   font-size: 13px;
