@@ -3,19 +3,9 @@ import { useApp } from '../context/AppContext';
 import WordMixButtons from './WordMixButtons';
 import HighlightedMessage from './HighlightedMessage';
 
-/* ------------------------------------------------------------------ */
-/*  Helpers                                                            */
-/* ------------------------------------------------------------------ */
 
-// Parse AI output that contains "EN: ..." translation line
-// Returns { sentence, translation }
-function parseSentenceContent(content) {
-  const text = (content || '').trim();
-  const enIdx = text.search(/\nEN:/i);
-  if (enIdx === -1) return { sentence: text, translation: null };
-  const sentence = text.slice(0, enIdx).trim();
-  const translation = text.slice(enIdx).replace(/^\nEN:\s*/i, '').trim();
-  return { sentence, translation };
+function stripEnPrefix(text) {
+  return text.replace(/^\s*EN:\s*/i, '').trim();
 }
 
 /* ------------------------------------------------------------------ */
@@ -42,7 +32,7 @@ export default function ChatArea() {
   // { [msgIdx]: { shown: bool, text: string, loading: bool } }
   const [translations, setTranslations] = useState({});
 
-  const handleToggleEnglish = useCallback(async (msgIdx, content, preloaded) => {
+  const handleToggleEnglish = useCallback(async (msgIdx, content) => {
     const current = translations[msgIdx];
 
     // Hide if already shown
@@ -51,13 +41,7 @@ export default function ChatArea() {
       return;
     }
 
-    // Use preloaded translation from the AI response (no extra API call)
-    if (preloaded) {
-      setTranslations((prev) => ({ ...prev, [msgIdx]: { shown: true, text: preloaded, loading: false } }));
-      return;
-    }
-
-    // Show cached translation without re-fetching
+    // Show cached/background-fetched translation without re-fetching
     if (current?.text) {
       setTranslations((prev) => ({ ...prev, [msgIdx]: { ...prev[msgIdx], shown: true } }));
       return;
@@ -100,7 +84,7 @@ export default function ChatArea() {
                 fullText += payload.content;
                 setTranslations((prev) => ({
                   ...prev,
-                  [msgIdx]: { shown: true, text: fullText, loading: false },
+                  [msgIdx]: { shown: true, text: stripEnPrefix(fullText), loading: false },
                 }));
               }
             } catch { /* skip */ }
@@ -168,6 +152,73 @@ export default function ChatArea() {
     });
   }, [history, isStreaming]);
 
+  /* ── background auto-translate new vocab assistant messages ----- */
+  useEffect(() => {
+    if (isStreaming || !isWordMix) return;
+
+    // Find the last assistant message that needs a background translation
+    const lastIdx = history.length - 1;
+    if (lastIdx < 0) return;
+    const msg = history[lastIdx];
+    if (msg.role !== 'assistant' || msg.useMarkdown) return;
+    if (translations[lastIdx] !== undefined) return; // already fetched or shown
+
+    const content = msg.content || '';
+    if (!content.trim()) return;
+
+    // Pre-fetch in background (hidden, not shown until user clicks)
+    setTranslations((prev) => ({ ...prev, [lastIdx]: { shown: false, text: '', loading: true } }));
+
+    (async () => {
+      try {
+        const res = await fetch(`${apiBase}/api/chat`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            model: currentModel,
+            messages: [{ role: 'user', content: `请把以下中英混合句子翻译成完整自然的英文，只输出翻译结果，不要任何解释：\n\n${content}` }],
+            stream: true,
+          }),
+        });
+
+        const reader = res.body.getReader();
+        const decoder = new TextDecoder();
+        let buffer = '';
+        let fullText = '';
+
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+          buffer += decoder.decode(value, { stream: true });
+          const lines = buffer.split('\n');
+          buffer = lines.pop();
+          for (const line of lines) {
+            const trimmed = line.trim();
+            if (!trimmed || trimmed === 'data: [DONE]') continue;
+            if (trimmed.startsWith('data: ')) {
+              try {
+                const payload = JSON.parse(trimmed.slice(6));
+                if (payload.content) {
+                  fullText += payload.content;
+                  setTranslations((prev) => ({
+                    ...prev,
+                    [lastIdx]: { shown: prev[lastIdx]?.shown ?? false, text: stripEnPrefix(fullText), loading: false },
+                  }));
+                }
+              } catch { /* skip */ }
+            }
+          }
+        }
+      } catch {
+        setTranslations((prev) => ({
+          ...prev,
+          [lastIdx]: { shown: prev[lastIdx]?.shown ?? false, text: '(Translation failed)', loading: false },
+        }));
+      }
+    })();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isStreaming, isWordMix]);
+
   /* ── focus textarea on mount and when streaming ends ------------ */
   useEffect(() => {
     if (!isWordMix) textareaRef.current?.focus();
@@ -230,11 +281,6 @@ export default function ChatArea() {
 
     const isPanelOpen = selectedWordInfo?.msgIdx === idx;
 
-    // Parse sentence and pre-generated English translation from content
-    const { sentence, translation: preloadedTranslation } = useHighlight
-      ? parseSentenceContent(msg.content || '')
-      : { sentence: msg.content || '', translation: null };
-
     return (
       <div key={idx}>
         <div className={`msg-row ${msg.role}`}>
@@ -244,7 +290,7 @@ export default function ChatArea() {
             ) : useHighlight ? (
               <>
                 <HighlightedMessage
-                  content={sentence}
+                  content={msg.content || ''}
                   msgIdx={idx}
                   selectedWordInfo={selectedWordInfo}
                   onWordClick={handleWordClick}
@@ -252,7 +298,7 @@ export default function ChatArea() {
                 <div className="en-translate-wrap">
                   <button
                     className="en-translate-btn"
-                    onClick={() => handleToggleEnglish(idx, sentence, preloadedTranslation)}
+                    onClick={() => handleToggleEnglish(idx, msg.content || '')}
                   >
                     {translations[idx]?.shown ? 'Hide English' : 'Show English'}
                   </button>
